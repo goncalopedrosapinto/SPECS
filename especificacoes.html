@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Especificações — Caetano Sales Force</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Regular.otf') format('opentype'); font-weight: 400; }
+        @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Bold.otf') format('opentype'); font-weight: 700; }
+        @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Light.otf') format('opentype'); font-weight: 300; }
+
+        body { font-family: 'BMWTypeNext', 'Helvetica Neue', Arial, sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Modelo card */
+        .modelo-card { transition: all .18s; cursor: pointer; }
+        .modelo-card:hover { border-color: #0066B1; box-shadow: 0 4px 16px rgba(0,102,177,.10); }
+        .modelo-card.selected { border-color: #0066B1; background: #EFF6FF; box-shadow: 0 4px 20px rgba(0,102,177,.15); }
+        .modelo-card.selected .modelo-nome { color: #0066B1; }
+
+        /* Motorização pill */
+        .mot-pill { transition: all .15s; cursor: pointer; }
+        .mot-pill:hover { border-color: #0066B1; color: #0066B1; }
+        .mot-pill.selected { background: #0066B1; color: #fff; border-color: #0066B1; }
+
+        /* Tabela de specs */
+        .spec-row:nth-child(even) { background: #F8FAFC; }
+        .spec-row:hover { background: #EFF6FF; }
+
+        /* Secção header */
+        .secao-header { background: #0066B1; color: #fff; }
+
+        /* Sticky compare bar */
+        .compare-bar { transition: transform .3s, opacity .3s; }
+
+        /* Animações */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn .25s ease both; }
+
+        /* Loading shimmer */
+        @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+        .shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 400px 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+    </style>
+    <script>tailwind.config = { theme: { extend: { colors: { bmw: '#0066B1' } } } }</script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+
+    <!-- HEADER igual ao site principal -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <h1 class="text-xl sm:text-2xl font-bold text-bmw tracking-tight uppercase">
+                    Caetano <span class="text-gray-800 font-extrabold">Sales Force</span>
+                </h1>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" alt="BMW" class="h-8 sm:h-11">
+            </div>
+        </div>
+        <!-- Nav -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex space-x-6 overflow-x-auto no-scrollbar">
+                <a href="#" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Parque</a>
+                <a href="#" class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Especificações</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
+
+        <!-- ESTADO: loading -->
+        <div id="loading-state" class="flex items-center justify-center py-20">
+            <div class="w-6 h-6 border-2 border-bmw border-t-transparent rounded-full animate-spin mr-3"></div>
+            <span class="text-sm font-bold uppercase tracking-widest text-gray-500">A carregar modelos...</span>
+        </div>
+
+        <!-- ESTADO: erro -->
+        <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-medium"></div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div id="main-content" class="hidden">
+
+            <!-- PASSO 1: Selecionar modelo -->
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-7 h-7 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center flex-shrink-0">1</div>
+                    <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Selecionar Modelo</h2>
+                </div>
+
+                <!-- Barra de pesquisa -->
+                <div class="relative mb-4">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                    </svg>
+                    <input type="text" id="pesquisa-modelo" placeholder="Pesquisar modelo..." oninput="filtrarModelos()"
+                        class="w-full sm:w-80 bg-white border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm outline-none focus:border-bmw shadow-sm">
+                </div>
+
+                <!-- Grid de modelos -->
+                <div id="grid-modelos" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3"></div>
+            </div>
+
+            <!-- PASSO 2: Selecionar motorização (aparece após selecionar modelo) -->
+            <div id="passo-motorizacao" class="hidden mb-8 fade-in">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-7 h-7 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center flex-shrink-0">2</div>
+                    <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Motorização</h2>
+                    <span id="modelo-selecionado-label" class="text-xs text-bmw font-bold bg-blue-50 border border-blue-200 px-3 py-1 rounded-full"></span>
+                </div>
+                <div id="grid-motorizacoes" class="flex flex-wrap gap-2"></div>
+            </div>
+
+            <!-- PASSO 3: Tabela de especificações -->
+            <div id="passo-specs" class="hidden fade-in">
+                <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                    <div class="flex items-center gap-3">
+                        <div class="w-7 h-7 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center flex-shrink-0">3</div>
+                        <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Especificações</h2>
+                    </div>
+                    <!-- Comparar: badge com nº seleccionadas -->
+                    <div class="flex items-center gap-3">
+                        <span id="label-comparar" class="text-xs text-gray-400 font-bold hidden sm:inline">Selecione até 4 motorizações para comparar</span>
+                        <button id="btn-limpar" onclick="limparSelecao()" class="text-xs text-gray-400 hover:text-red-500 font-bold uppercase tracking-widest hidden">Limpar</button>
+                    </div>
+                </div>
+
+                <!-- Cabeçalho fixo das motorizações selecionadas -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <!-- Header da tabela -->
+                    <div id="tabela-header" class="overflow-x-auto no-scrollbar">
+                        <!-- preenchido dinamicamente -->
+                    </div>
+
+                    <!-- Corpo da tabela -->
+                    <div id="tabela-corpo" class="overflow-x-auto no-scrollbar">
+                        <!-- preenchido dinamicamente -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- BARRA FLUTUANTE DE COMPARAÇÃO (mobile) -->
+    <div id="compare-bar" class="compare-bar fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 shadow-2xl px-4 py-3 hidden">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+            <div>
+                <p class="text-xs font-black text-gray-800 uppercase tracking-widest">A comparar</p>
+                <p class="text-[10px] text-gray-400 mt-0.5" id="compare-bar-label"></p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="limparSelecao()" class="text-xs text-gray-400 hover:text-red-500 font-bold px-3 py-2">Limpar</button>
+                <button onclick="scrollParaTabela()" class="bg-bmw text-white text-xs font-bold px-5 py-2 rounded-lg uppercase tracking-widest">Ver Tabela</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── CONFIGURAÇÃO ──────────────────────────────────────────────────────
+        const SUPABASE_URL = 'https://lhznwlfovoifvoxruqcj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxoem53bGZvdm9pZnZveHJ1cWNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MTkzMDQsImV4cCI6MjA5MjQ5NTMwNH0.3rJYpsuFic-2Hd88ce-8f5DCZgwM5zCfYKt_gKOzhio'; // ← anon key do Supabase
+
+        // ── ESTADO ────────────────────────────────────────────────────────────
+        let sb = null;
+        let todosModelos = [];
+        let modelosFiltrados = [];
+        let modeloAtivo = null;
+        let motorizacoesDoModelo = [];
+        let motSelecionadas = []; // array de ids de motorização
+        let specsCache = {};      // cache: motorizacao_id → { chave: valor }
+
+        // ── ARRANQUE ─────────────────────────────────────────────────────────
+        window.onload = async () => {
+            try {
+                sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                await carregarModelos();
+            } catch(e) {
+                mostrarErro('Erro ao ligar ao Supabase: ' + e.message);
+            }
+        };
+
+        async function carregarModelos() {
+            const { data, error } = await sb.from('modelos').select('id, codigo, nome').order('nome');
+            if (error) { mostrarErro(error.message); return; }
+            todosModelos = data || [];
+            modelosFiltrados = [...todosModelos];
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            renderizarGridModelos();
+        }
+
+        // ── FILTRO DE PESQUISA ────────────────────────────────────────────────
+        function filtrarModelos() {
+            const q = document.getElementById('pesquisa-modelo').value.toLowerCase();
+            modelosFiltrados = q
+                ? todosModelos.filter(m => m.nome.toLowerCase().includes(q) || m.codigo.toLowerCase().includes(q))
+                : [...todosModelos];
+            renderizarGridModelos();
+        }
+
+        // ── RENDER: GRID DE MODELOS ───────────────────────────────────────────
+        function renderizarGridModelos() {
+            const grid = document.getElementById('grid-modelos');
+            if (modelosFiltrados.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-sm text-gray-400 py-8 font-bold">Nenhum modelo encontrado.</p>';
+                return;
+            }
+            grid.innerHTML = modelosFiltrados.map(m => {
+                const isActive = modeloAtivo && modeloAtivo.id === m.id;
+                return `
+                <div class="modelo-card rounded-xl border-2 ${isActive ? 'selected border-bmw bg-blue-50' : 'border-gray-200 bg-white'} p-4 flex flex-col items-center text-center gap-2 shadow-sm"
+                     onclick="selecionarModelo('${m.id}', '${escapar(m.nome)}', '${m.codigo}')">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-1">
+                        <span class="text-[10px] font-black text-gray-500 uppercase">${m.codigo.substring(0,4)}</span>
+                    </div>
+                    <p class="modelo-nome text-xs font-black text-gray-800 leading-tight ${isActive ? 'text-bmw' : ''}">${m.nome}</p>
+                </div>`;
+            }).join('');
+        }
+
+        // ── SELECIONAR MODELO ─────────────────────────────────────────────────
+        async function selecionarModelo(id, nome, codigo) {
+            modeloAtivo = { id, nome, codigo };
+            motSelecionadas = [];
+            specsCache = {};
+            renderizarGridModelos();
+
+            // label
+            document.getElementById('modelo-selecionado-label').innerText = nome;
+
+            // Mostrar passo 2
+            const passeMot = document.getElementById('passo-motorizacao');
+            passeMot.classList.remove('hidden');
+            passeMot.classList.add('fade-in');
+
+            // esconder passo 3 enquanto carrega
+            document.getElementById('passo-specs').classList.add('hidden');
+
+            // carregar motorizações
+            document.getElementById('grid-motorizacoes').innerHTML = `
+                <div class="shimmer h-10 w-28 rounded-full"></div>
+                <div class="shimmer h-10 w-36 rounded-full"></div>
+                <div class="shimmer h-10 w-24 rounded-full"></div>`;
+
+            const { data, error } = await sb
+                .from('motorizacoes')
+                .select('id, codigo, nome_visual')
+                .eq('modelo_id', id)
+                .order('codigo');
+
+            if (error) { mostrarErro(error.message); return; }
+            motorizacoesDoModelo = data || [];
+            renderizarPills();
+            passeMot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ── RENDER: PILLS DE MOTORIZAÇÃO ─────────────────────────────────────
+        function renderizarPills() {
+            const cont = document.getElementById('grid-motorizacoes');
+            cont.innerHTML = motorizacoesDoModelo.map(m => {
+                const sel = motSelecionadas.includes(m.id);
+                return `
+                <button class="mot-pill border-2 rounded-full px-4 py-2 text-xs font-bold ${sel ? 'selected' : 'border-gray-200 bg-white text-gray-700'} shadow-sm"
+                        onclick="toggleMotorizacao('${m.id}')">
+                    ${m.nome_visual || m.codigo}
+                </button>`;
+            }).join('');
+        }
+
+        // ── TOGGLE MOTORIZAÇÃO ────────────────────────────────────────────────
+        async function toggleMotorizacao(id) {
+            if (motSelecionadas.includes(id)) {
+                motSelecionadas = motSelecionadas.filter(x => x !== id);
+            } else {
+                if (motSelecionadas.length >= 4) {
+                    alert('Pode comparar no máximo 4 motorizações em simultâneo.');
+                    return;
+                }
+                motSelecionadas.push(id);
+                // carregar specs se ainda não estiver em cache
+                if (!specsCache[id]) await carregarSpecs(id);
+            }
+            renderizarPills();
+            atualizarTabela();
+            atualizarCompareBar();
+        }
+
+        // ── CARREGAR SPECS ────────────────────────────────────────────────────
+        async function carregarSpecs(motId) {
+            const { data, error } = await sb
+                .from('especificacoes')
+                .select('chave, valor')
+                .eq('motorizacao_id', motId)
+                .order('chave');
+            if (!error && data) {
+                specsCache[motId] = {};
+                data.forEach(r => { specsCache[motId][r.chave] = r.valor; });
+            }
+        }
+
+        // ── ATUALIZAR TABELA ──────────────────────────────────────────────────
+        function atualizarTabela() {
+            const passoSpecs = document.getElementById('passo-specs');
+
+            if (motSelecionadas.length === 0) {
+                passoSpecs.classList.add('hidden');
+                return;
+            }
+
+            passoSpecs.classList.remove('hidden');
+            passoSpecs.classList.add('fade-in');
+
+            // Recolher todas as chaves únicas (mantendo ordem de inserção)
+            const todasChaves = [];
+            motSelecionadas.forEach(id => {
+                if (specsCache[id]) {
+                    Object.keys(specsCache[id]).forEach(k => {
+                        if (!todasChaves.includes(k)) todasChaves.push(k);
+                    });
+                }
+            });
+
+            // Obter nomes visuais das motorizações selecionadas
+            const motsInfo = motSelecionadas.map(id =>
+                motorizacoesDoModelo.find(m => m.id === id) || { id, nome_visual: id, codigo: id }
+            );
+
+            // ── HEADER ──
+            const colWidth = motSelecionadas.length === 1 ? 'min-w-[140px]' : 'min-w-[120px]';
+            let headerHtml = `
+            <table class="w-full text-sm" style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 42%">
+                    ${motsInfo.map(() => `<col style="width: ${58 / motsInfo.length}%">`).join('')}
+                </colgroup>
+                <thead>
+                    <tr class="border-b-2 border-gray-100">
+                        <th class="px-4 sm:px-5 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50">
+                            Especificação
+                        </th>
+                        ${motsInfo.map(m => `
+                        <th class="px-3 sm:px-5 py-4 text-left bg-gray-50 border-l border-gray-100">
+                            <p class="text-xs font-black text-bmw leading-tight">${m.nome_visual || m.codigo}</p>
+                            <p class="text-[10px] text-gray-400 font-mono mt-0.5">${m.codigo}</p>
+                        </th>`).join('')}
+                    </tr>
+                </thead>
+            </table>`;
+            document.getElementById('tabela-header').innerHTML = headerHtml;
+
+            // ── CORPO ──
+            if (todasChaves.length === 0) {
+                document.getElementById('tabela-corpo').innerHTML =
+                    '<p class="text-center text-sm text-gray-400 py-12 font-bold">Sem especificações disponíveis.</p>';
+                return;
+            }
+
+            let bodyHtml = `
+            <table class="w-full text-sm" style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 42%">
+                    ${motsInfo.map(() => `<col style="width: ${58 / motsInfo.length}%">`).join('')}
+                </colgroup>
+                <tbody>`;
+
+            todasChaves.forEach((chave, i) => {
+                const valores = motsInfo.map(m => specsCache[m.id]?.[chave] ?? '—');
+
+                // Detectar se todos os valores são iguais (highlight de diferença)
+                const todosIguais = valores.every(v => v === valores[0]);
+                const rowClass = i % 2 === 0 ? 'bg-white' : 'bg-slate-50/70';
+
+                bodyHtml += `
+                <tr class="spec-row ${rowClass} border-b border-gray-100 hover:bg-blue-50/40 transition-colors">
+                    <td class="px-4 sm:px-5 py-3 text-xs font-medium text-gray-600 leading-snug">${chave}</td>
+                    ${valores.map(v => `
+                    <td class="px-3 sm:px-5 py-3 text-xs font-bold border-l border-gray-100 ${v === '—' ? 'text-gray-300' : (todosIguais ? 'text-gray-800' : 'text-bmw')} leading-snug">
+                        ${v ?? '—'}
+                    </td>`).join('')}
+                </tr>`;
+            });
+
+            bodyHtml += `</tbody></table>`;
+            document.getElementById('tabela-corpo').innerHTML = bodyHtml;
+            document.getElementById('btn-limpar').classList.remove('hidden');
+        }
+
+        // ── BARRA FLUTUANTE ───────────────────────────────────────────────────
+        function atualizarCompareBar() {
+            const bar = document.getElementById('compare-bar');
+            if (motSelecionadas.length > 0) {
+                bar.classList.remove('hidden');
+                const nomes = motSelecionadas
+                    .map(id => motorizacoesDoModelo.find(m => m.id === id)?.nome_visual || id)
+                    .join(' · ');
+                document.getElementById('compare-bar-label').innerText = nomes;
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        // ── LIMPAR SELEÇÃO ────────────────────────────────────────────────────
+        function limparSelecao() {
+            motSelecionadas = [];
+            renderizarPills();
+            atualizarTabela();
+            atualizarCompareBar();
+            document.getElementById('btn-limpar').classList.add('hidden');
+        }
+
+        function scrollParaTabela() {
+            document.getElementById('passo-specs')?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ── UTILITÁRIOS ───────────────────────────────────────────────────────
+        function mostrarErro(msg) {
+            document.getElementById('loading-state').classList.add('hidden');
+            const el = document.getElementById('error-state');
+            el.classList.remove('hidden');
+            el.innerText = '⚠️ ' + msg;
+        }
+
+        function escapar(str) {
+            return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>
