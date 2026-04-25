@@ -247,12 +247,6 @@
                     ${m.nome}
                 </button>`).join('');
 
-            // Botão Todos dentro da série
-            if (modelosDaSerie.length > 1) {
-                cont.innerHTML += `<button class="modelo-btn active px-4 py-2 rounded-md text-xs"
-                    id="mbtn-todos"
-                    onclick="selecionarTodosModelos()">Todos</button>`;
-            }
             wrap.classList.remove('hidden');
         } else {
             wrap.classList.add('hidden');
@@ -301,17 +295,7 @@
         passeMot.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    function selecionarTodosModelos() {
-        // Limpar seleção de modelo específico
-        modeloAtivo = null;
-        motSelecionadas = [];
-        specsCache = [];
-        document.querySelectorAll('.modelo-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('mbtn-todos')?.classList.add('active');
-        document.getElementById('passo-motorizacao').classList.add('hidden');
-        document.getElementById('passo-specs').classList.add('hidden');
-        document.getElementById('compare-bar').classList.add('hidden');
-    }
+
 
     // ── PILLS DE MOTORIZAÇÃO ──────────────────────────────────────────────────
     function renderizarPills() {
