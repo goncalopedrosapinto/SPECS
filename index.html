@@ -169,15 +169,13 @@
     // ── AGRUPAMENTO POR SÉRIE ─────────────────────────────────────────────────
     // Regras: o nome do modelo é analisado para determinar a série
     const SERIES = [
-        { label: '1', match: n => /série 1|series 1/i.test(n) },
-        { label: '2', match: n => /série 2|series 2/i.test(n) },
-        { label: '3', match: n => /série 3|series 3/i.test(n) },
-        { label: '4', match: n => /série 4|series 4/i.test(n) },
-        { label: '5', match: n => /série 5|series 5/i.test(n) },
+        { label: '1', match: n => /série 1|series 1|\bm135\b|\bm140\b/i.test(n) },
+        { label: '2', match: n => /série 2|series 2|\bm2\b/i.test(n) },
+        { label: '3', match: n => /série 3|series 3|\bm3\b/i.test(n) },
+        { label: '4', match: n => /série 4|series 4|\bm4\b|\bi4\b/i.test(n) },
+        { label: '5', match: n => /série 5|series 5|\bm5\b/i.test(n) },
         { label: '7', match: n => /série 7|series 7/i.test(n) },
-        { label: 'X', match: n => /\bx1\b|\bx2\b|\bx3\b|\bx4\b|\bx5\b|\bx6\b|\bx7\b|\bxm\b/i.test(n) },
-        { label: 'M', match: n => /\bm2\b|\bm3\b|\bm4\b|\bm5\b|\bxm\b/i.test(n) },
-        { label: 'i', match: n => /\bi4\b|\bix\b|\bix3\b|\bi20\b/i.test(n) },
+        { label: 'X', match: n => /\bx1\b|\bx2\b|\bx3\b|\bx4\b|\bx5\b|\bx6\b|\bx7\b|\bxm\b|\bix\b|\bix3\b|\bix1\b|\bix2\b/i.test(n) },
         { label: 'Z', match: n => /\bz4\b/i.test(n) },
     ];
 
@@ -207,7 +205,7 @@
     function renderizarSeries(modelos) {
         // Descobrir séries presentes
         const seriesPresentes = new Set(modelos.map(m => getSerie(m.nome)));
-        const ordemSeries = ['1','2','3','4','5','7','X','M','i','Z','Outros'];
+        const ordemSeries = ['1','2','3','4','5','7','X','Z','Outros'];
         const cont = document.getElementById('filtro-series');
 
         let html = '';
@@ -415,13 +413,26 @@
     // ── PESQUISA ──────────────────────────────────────────────────────────────
     function pesquisar() {
         const q = document.getElementById('pesquisa').value.toLowerCase().trim();
-        if (!q) { renderizarSeries(todosModelos); return; }
+        const wrap = document.getElementById('filtro-modelos-wrap');
+        const cont = document.getElementById('filtro-modelos');
+
+        if (!q) {
+            // Sem pesquisa — repõe estado normal
+            wrap.classList.add('hidden');
+            serieAtiva = null;
+            renderizarSeries(todosModelos);
+            return;
+        }
+
         const filtrados = todosModelos.filter(m =>
             m.nome.toLowerCase().includes(q) || m.codigo.toLowerCase().includes(q)
         );
-        // Mostrar resultados diretamente como modelos
-        const cont = document.getElementById('filtro-modelos');
-        const wrap = document.getElementById('filtro-modelos-wrap');
+
+        // Desativar série selecionada
+        serieAtiva = null;
+        renderizarSeries(todosModelos);
+
+        // Mostrar resultados no nível 2
         if (filtrados.length === 0) {
             cont.innerHTML = '<p class="text-xs text-gray-400 font-bold py-2">Nenhum modelo encontrado.</p>';
         } else {
@@ -433,8 +444,6 @@
                 </button>`).join('');
         }
         wrap.classList.remove('hidden');
-        serieAtiva = null;
-        renderizarSeries(todosModelos);
     }
 
     // ── COMPARE BAR ───────────────────────────────────────────────────────────
