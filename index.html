@@ -64,7 +64,8 @@
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex space-x-6 overflow-x-auto no-scrollbar">
-                <button class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Especificações</button>
+                <button onclick="mudarTab('dados')" id="tab-dados" class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Dados Técnicos</button>
+                <button onclick="mudarTab('comparador')" id="tab-comparador" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Comparador</button>
             </nav>
         </div>
     </header>
@@ -94,22 +95,33 @@
         <!-- ERRO -->
         <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-medium mb-5"></div>
 
-        <!-- CONTEÚDO -->
-        <div id="main-content" class="hidden">
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: DADOS TÉCNICOS                                     -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="conteudo-dados" class="hidden">
 
-            <!-- FILTRO NÍVEL 1: Séries -->
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 sm:px-5 py-4 mb-3">
-                <div class="flex flex-wrap gap-2" id="filtro-series">
-                    <!-- preenchido dinamicamente -->
+            <!-- BARRA DE PESQUISA -->
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-5 flex items-center gap-3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" alt="BMW" class="h-7 flex-shrink-0 hidden sm:block">
+                <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                    </svg>
+                    <input type="text" id="pesquisa" placeholder="Inserir código ou palavra para pesquisa"
+                        oninput="pesquisar()"
+                        class="search-input w-full border border-gray-200 rounded-lg pl-9 pr-4 py-2.5 text-sm bg-gray-50">
                 </div>
             </div>
 
-            <!-- FILTRO NÍVEL 2: Modelos da série -->
+            <!-- FILTRO NÍVEL 1: Séries -->
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 sm:px-5 py-4 mb-3">
+                <div class="flex flex-wrap gap-2" id="filtro-series"></div>
+            </div>
+
+            <!-- FILTRO NÍVEL 2: Modelos -->
             <div id="filtro-modelos-wrap" class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 sm:px-5 py-4 mb-5 hidden fade-in">
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Outras categorias</p>
-                <div class="flex flex-wrap gap-2" id="filtro-modelos">
-                    <!-- preenchido dinamicamente -->
-                </div>
+                <div class="flex flex-wrap gap-2" id="filtro-modelos"></div>
             </div>
 
             <!-- PASSO 2: Motorizações -->
@@ -127,14 +139,13 @@
                 </div>
             </div>
 
-            <!-- PASSO 3: Tabela de especificações -->
+            <!-- PASSO 3: Tabela -->
             <div id="passo-specs" class="hidden fade-in">
                 <div class="flex items-center gap-3 mb-3">
                     <div class="w-6 h-6 rounded-full bg-bmw text-white text-[10px] font-black flex items-center justify-center">3</div>
                     <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Especificações</p>
-                    <span class="text-[10px] text-gray-400 hidden sm:inline">— valores a azul indicam diferenças entre motorizações</span>
+                    <span class="text-[10px] text-gray-400 hidden sm:inline">— valores a azul indicam diferenças</span>
                 </div>
-
                 <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                     <div class="overflow-x-auto no-scrollbar">
                         <table id="tabela-specs" class="w-full text-sm min-w-[400px]">
@@ -144,9 +155,66 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: COMPARADOR                                         -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <div id="conteudo-comparador" class="hidden">
+
+            <!-- Instrução -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl px-5 py-3 mb-5 flex items-center gap-3">
+                <svg class="w-4 h-4 text-bmw flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-xs font-bold text-bmw">Selecione até 4 modelos e escolha uma motorização de cada para comparar lado a lado.</p>
+            </div>
+
+            <!-- Slots de seleção -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6" id="comp-slots">
+                <!-- preenchido dinamicamente -->
+            </div>
+
+            <!-- Tabela comparativa -->
+            <div id="comp-tabela-wrap" class="hidden fade-in">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded-full bg-bmw text-white text-[10px] font-black flex items-center justify-center">✓</div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Comparação</p>
+                        <span class="text-[10px] text-gray-400 hidden sm:inline">— valores a azul indicam diferenças</span>
+                    </div>
+                    <button onclick="limparComparador()" class="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest">Limpar tudo</button>
+                </div>
+                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-sm" style="min-width: 500px;">
+                            <thead id="comp-thead"></thead>
+                            <tbody id="comp-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
+
+    <!-- MODAL: Seleção de modelo para comparador -->
+    <div id="modal-comp" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden" style="max-height: 85vh;">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 class="text-base font-black text-gray-800 uppercase tracking-widest">Escolher Modelo</h2>
+                <button onclick="fecharModalComp()" class="text-gray-400 hover:text-red-500 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="relative">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+                    <input type="text" id="comp-pesquisa" placeholder="Pesquisar modelo..." oninput="pesquisarModalComp()"
+                        class="w-full border border-gray-200 rounded-lg pl-9 pr-4 py-2.5 text-sm bg-gray-50 outline-none focus:border-bmw">
+                </div>
+            </div>
+            <input type="hidden" id="modal-comp-slot" value="0">
+            <div class="overflow-y-auto p-3 space-y-1.5 flex-1 no-scrollbar" id="comp-lista-modelos"></div>
+        </div>
+    </div>
 
     <!-- BARRA FLUTUANTE MOBILE -->
     <div id="compare-bar" class="hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t-2 border-bmw shadow-2xl px-4 py-3">
@@ -155,9 +223,7 @@
                 <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest">A ver</p>
                 <p class="text-xs font-bold text-gray-800 truncate" id="compare-bar-label"></p>
             </div>
-            <button onclick="scrollParaTabela()" class="bg-bmw text-white text-xs font-bold px-5 py-2.5 rounded-lg uppercase tracking-widest flex-shrink-0">
-                Ver Tabela ↓
-            </button>
+            <button onclick="scrollParaTabela()" class="bg-bmw text-white text-xs font-bold px-5 py-2.5 rounded-lg uppercase tracking-widest flex-shrink-0">Ver Tabela ↓</button>
         </div>
     </div>
 
@@ -165,6 +231,19 @@
     // ── CONFIG ────────────────────────────────────────────────────────────────
     const SUPABASE_URL = 'https://lhznwlfovoifvoxruqcj.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxoem53bGZvdm9pZnZveHJ1cWNqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MTkzMDQsImV4cCI6MjA5MjQ5NTMwNH0.3rJYpsuFic-2Hd88ce-8f5DCZgwM5zCfYKt_gKOzhio';
+
+    // ── TABS ──────────────────────────────────────────────────────────────────
+    function mudarTab(tab) {
+        ['dados','comparador'].forEach(t => {
+            document.getElementById('conteudo-' + t).classList.add('hidden');
+            document.getElementById('tab-' + t).classList.remove('border-bmw','text-bmw');
+            document.getElementById('tab-' + t).classList.add('border-transparent','text-gray-400');
+        });
+        document.getElementById('conteudo-' + tab).classList.remove('hidden');
+        document.getElementById('tab-' + tab).classList.add('border-bmw','text-bmw');
+        document.getElementById('tab-' + tab).classList.remove('border-transparent','text-gray-400');
+        if (tab === 'comparador') renderizarSlots();
+    }
 
     // ── AGRUPAMENTO POR SÉRIE ─────────────────────────────────────────────────
     // Regras: o nome do modelo é analisado para determinar a série
@@ -197,8 +276,9 @@
         if (error) { mostrarErro(error.message); return; }
         todosModelos = data || [];
         document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
+        document.getElementById('conteudo-dados').classList.remove('hidden');
         renderizarSeries(todosModelos);
+        renderizarSlots();
     };
 
     // ── RENDER: SÉRIES ────────────────────────────────────────────────────────
@@ -456,8 +536,181 @@
         atualizarCompareBar();
     }
 
-    // ── UTILITÁRIOS ───────────────────────────────────────────────────────────
-    function mostrarErro(msg) {
+    // ── COMPARADOR ────────────────────────────────────────────────────────────
+    const MAX_COMP = 4;
+    let compSlots = [null, null, null, null]; // cada slot: { modeloId, modeloNome, motId, motNome, specs }
+
+    function renderizarSlots() {
+        const cont = document.getElementById('comp-slots');
+        cont.innerHTML = compSlots.map((slot, i) => {
+            if (!slot || !slot.modeloId) {
+                // Slot vazio
+                return `
+                <div class="bg-white border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center min-h-[160px] gap-3 cursor-pointer hover:border-bmw transition-colors"
+                     onclick="abrirSeletorModelo(${i})">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Adicionar modelo</p>
+                </div>`;
+            }
+            if (!slot.motId) {
+                // Modelo selecionado, falta motorização
+                return `
+                <div class="bg-white border-2 border-bmw rounded-xl p-4 flex flex-col min-h-[160px] gap-2 fade-in">
+                    <div class="flex justify-between items-start">
+                        <p class="text-xs font-black text-gray-800 leading-tight flex-1">${slot.modeloNome}</p>
+                        <button onclick="limparSlot(${i})" class="text-gray-300 hover:text-red-400 ml-2 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Escolha a motorização:</p>
+                    <div class="flex flex-col gap-1.5 overflow-y-auto max-h-[120px] no-scrollbar" id="comp-mots-${i}">
+                        <div class="shimmer h-7 w-full rounded-full"></div>
+                        <div class="shimmer h-7 w-3/4 rounded-full"></div>
+                    </div>
+                </div>`;
+            }
+            // Slot completo
+            return `
+            <div class="bg-white border-2 border-green-400 rounded-xl p-4 flex flex-col min-h-[160px] gap-2 fade-in">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <p class="text-xs font-black text-gray-800 leading-tight">${slot.modeloNome}</p>
+                        <p class="text-[11px] font-bold text-bmw mt-1">${slot.motNome}</p>
+                    </div>
+                    <button onclick="limparSlot(${i})" class="text-gray-300 hover:text-red-400 ml-2 flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="mt-auto flex items-center gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                    <span class="text-[10px] font-bold text-green-600 uppercase tracking-widest">Pronto</span>
+                </div>
+            </div>`;
+        }).join('');
+
+        // Carregar motorizações para slots com modelo mas sem mot
+        compSlots.forEach((slot, i) => {
+            if (slot && slot.modeloId && !slot.motId) {
+                carregarMotsParaSlot(i, slot.modeloId);
+            }
+        });
+
+        renderizarTabelaComparadora();
+    }
+
+    async function carregarMotsParaSlot(slotIdx, modeloId) {
+        const { data } = await sb.from('motorizacoes').select('id, codigo, nome_visual').eq('modelo_id', modeloId).order('codigo');
+        const cont = document.getElementById('comp-mots-' + slotIdx);
+        if (!cont) return;
+        cont.innerHTML = (data || []).map(m => `
+            <button class="text-left px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-700 hover:border-bmw hover:text-bmw transition-colors"
+                onclick="selecionarMotComparador(${slotIdx}, '${m.id}', '${escapar(m.nome_visual || m.codigo)}')">
+                ${m.nome_visual || m.codigo}
+            </button>`).join('');
+    }
+
+    async function selecionarMotComparador(slotIdx, motId, motNome) {
+        compSlots[slotIdx].motId = motId;
+        compSlots[slotIdx].motNome = motNome;
+        // Carregar specs
+        const { data } = await sb.from('especificacoes').select('chave, valor').eq('motorizacao_id', motId);
+        compSlots[slotIdx].specs = {};
+        (data || []).forEach(r => { compSlots[slotIdx].specs[r.chave] = r.valor; });
+        renderizarSlots();
+    }
+
+    function abrirSeletorModelo(slotIdx) {
+        // Modal simples de seleção
+        const modal = document.getElementById('modal-comp');
+        document.getElementById('modal-comp-slot').value = slotIdx;
+        document.getElementById('comp-pesquisa').value = '';
+        renderizarListaModalComp(todosModelos);
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('comp-pesquisa').focus();
+    }
+
+    function fecharModalComp() {
+        document.getElementById('modal-comp').classList.add('hidden');
+        document.getElementById('modal-comp').classList.remove('flex');
+    }
+
+    function renderizarListaModalComp(modelos) {
+        document.getElementById('comp-lista-modelos').innerHTML = modelos.map(m => `
+            <button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 bg-white hover:border-bmw hover:bg-blue-50 transition-colors"
+                onclick="selecionarModeloComparador('${m.id}', '${escapar(m.nome)}')">
+                <p class="text-sm font-black text-gray-800">${m.nome}</p>
+                <p class="text-[10px] text-gray-400 font-mono mt-0.5">${m.codigo}</p>
+            </button>`).join('');
+    }
+
+    function pesquisarModalComp() {
+        const q = document.getElementById('comp-pesquisa').value.toLowerCase();
+        const filtrados = q ? todosModelos.filter(m => m.nome.toLowerCase().includes(q) || m.codigo.toLowerCase().includes(q)) : todosModelos;
+        renderizarListaModalComp(filtrados);
+    }
+
+    function selecionarModeloComparador(modeloId, modeloNome) {
+        const slotIdx = parseInt(document.getElementById('modal-comp-slot').value);
+        compSlots[slotIdx] = { modeloId, modeloNome, motId: null, motNome: null, specs: {} };
+        fecharModalComp();
+        renderizarSlots();
+    }
+
+    function limparSlot(slotIdx) {
+        compSlots[slotIdx] = null;
+        renderizarSlots();
+    }
+
+    function limparComparador() {
+        compSlots = [null, null, null, null];
+        renderizarSlots();
+    }
+
+    function renderizarTabelaComparadora() {
+        const slotsCompletos = compSlots.filter(s => s && s.motId);
+        const wrap = document.getElementById('comp-tabela-wrap');
+
+        if (slotsCompletos.length < 2) { wrap.classList.add('hidden'); return; }
+        wrap.classList.remove('hidden');
+
+        // Recolher todas as chaves únicas
+        const todasChaves = [];
+        slotsCompletos.forEach(s => {
+            Object.keys(s.specs || {}).forEach(k => { if (!todasChaves.includes(k)) todasChaves.push(k); });
+        });
+
+        const colW = Math.floor(58 / slotsCompletos.length);
+
+        // THEAD
+        document.getElementById('comp-thead').innerHTML = `
+        <tr class="border-b-2 border-gray-100">
+            <th class="px-4 sm:px-5 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50" style="width:42%">Especificação</th>
+            ${slotsCompletos.map(s => `
+            <th class="px-3 sm:px-5 py-4 text-left bg-gray-50 border-l border-gray-100" style="width:${colW}%">
+                <p class="text-xs font-black text-bmw leading-tight">${s.modeloNome}</p>
+                <p class="text-[10px] text-gray-400 font-bold mt-0.5">${s.motNome}</p>
+            </th>`).join('')}
+        </tr>`;
+
+        // TBODY
+        document.getElementById('comp-tbody').innerHTML = todasChaves.map((chave, i) => {
+            const valores = slotsCompletos.map(s => s.specs?.[chave] ?? '—');
+            const todosIguais = valores.every(v => v === valores[0]);
+            return `
+            <tr class="border-b border-gray-100 ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'} hover:bg-blue-50/40 transition-colors">
+                <td class="px-4 sm:px-5 py-3 text-xs font-medium text-gray-600 leading-snug">${chave}</td>
+                ${valores.map(v => `
+                <td class="px-3 sm:px-5 py-3 text-xs font-bold border-l border-gray-100 leading-snug ${v === '—' ? 'text-gray-300' : (!todosIguais ? 'text-bmw' : 'text-gray-800')}">
+                    ${v}
+                </td>`).join('')}
+            </tr>`;
+        }).join('');
+
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
         document.getElementById('loading-state').classList.add('hidden');
         const el = document.getElementById('error-state');
         el.classList.remove('hidden');
