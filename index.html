@@ -259,25 +259,16 @@
     window.onload = async () => {
         try {
             sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            
-            // Timeout de 10 segundos
-            const timeout = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Tempo limite excedido — verifica a ligação à internet')), 10000)
-            );
-            
-            const query = sb.from('modelos').select('id, codigo, nome').order('nome');
-            const { data, error } = await Promise.race([query, timeout]);
-            
-            if (error) { mostrarErro('Erro Supabase: ' + error.message + ' | Código: ' + error.code); return; }
-            if (!data || data.length === 0) { mostrarErro('A tabela modelos está vazia ou sem permissões de leitura.'); return; }
-            
+            const { data, error } = await sb.from('modelos').select('id, codigo, nome').order('nome');
+            if (error) { mostrarErro('Erro: ' + error.message); return; }
+            if (!data || data.length === 0) { mostrarErro('Sem dados na tabela modelos.'); return; }
             todosModelos = data;
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('conteudo-dados').classList.remove('hidden');
             renderizarSeries(todosModelos);
             renderizarSlots();
         } catch(e) {
-            mostrarErro('Erro ao arrancar: ' + e.message);
+            mostrarErro('Erro: ' + e.message);
         }
     };
 
