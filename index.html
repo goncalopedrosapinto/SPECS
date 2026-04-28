@@ -502,6 +502,7 @@
             const ab = document.getElementById('tab-' + tab);
             ab.classList.add('border-bmw','text-bmw');
             ab.classList.remove('border-transparent','text-gray-400');
+            if (tab === 'comparador') renderizarSlots();
         }
 
         // ── COMPARADOR ────────────────────────────────────────────────────────
