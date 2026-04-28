@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Especificações — Caetano Sales Force</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
+        <style>
         @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Regular.otf') format('opentype'); font-weight: 400; }
         @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Bold.otf') format('opentype'); font-weight: 700; }
         @font-face { font-family: 'BMWTypeNext'; src: url('https://cdn.jsdelivr.net/gh/djore4/Caetano@main/fonts/BMWTypeNextLatin-Light.otf') format('opentype'); font-weight: 300; }
@@ -256,21 +255,30 @@
     let motorizacoesDoModelo = [], motSelecionadas = [], specsCache = {};
 
     // ── ARRANQUE ──────────────────────────────────────────────────────────────
-    window.onload = async () => {
+    document.addEventListener("DOMContentLoaded", async () => {
         try {
             sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            const { data, error } = await sb.from('modelos').select('id, codigo, nome').order('nome');
-            if (error) { mostrarErro('Erro: ' + error.message); return; }
-            if (!data || data.length === 0) { mostrarErro('Sem dados na tabela modelos.'); return; }
+            
+            // Timeout de 10 segundos
+            const timeout = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Tempo limite excedido — verifica a ligação à internet')), 10000)
+            );
+            
+            const query = sb.from('modelos').select('id, codigo, nome').order('nome');
+            const { data, error } = await Promise.race([query, timeout]);
+            
+            if (error) { mostrarErro('Erro Supabase: ' + error.message + ' | Código: ' + error.code); return; }
+            if (!data || data.length === 0) { mostrarErro('A tabela modelos está vazia ou sem permissões de leitura.'); return; }
+            
             todosModelos = data;
             document.getElementById('loading-state').classList.add('hidden');
             document.getElementById('conteudo-dados').classList.remove('hidden');
             renderizarSeries(todosModelos);
             renderizarSlots();
         } catch(e) {
-            mostrarErro('Erro: ' + e.message);
+            mostrarErro('Erro ao arrancar: ' + e.message);
         }
-    };
+    });
 
     // ── RENDER: SÉRIES ────────────────────────────────────────────────────────
     function renderizarSeries(modelos) {
@@ -710,5 +718,6 @@
 
     function escapar(s) { return (s||'').replace(/'/g, "\\'"); }
     </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </body>
 </html>
