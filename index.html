@@ -96,7 +96,7 @@
         <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-medium mb-5"></div>
 
         <!-- CONTEÚDO -->
-        <div id="main-content" class="hidden">
+        <div id="conteudo-dados" class="hidden">
 
             <!-- FILTRO NÍVEL 1: Séries -->
             <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 sm:px-5 py-4 mb-3">
@@ -147,7 +147,7 @@
             </div>
 
         </div>
-    </div><!-- /conteudo-dados -->
+
 
     <!-- ═══════════════════════════════════════════════════ -->
     <!-- TAB: OPCIONAIS                                      -->
@@ -297,7 +297,7 @@
         if (error) { mostrarErro(error.message); return; }
         todosModelos = data || [];
         document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
+        document.getElementById('conteudo-dados').classList.remove('hidden');
         renderizarSeries(todosModelos);
     };
 
