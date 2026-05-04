@@ -647,7 +647,13 @@
             document.getElementById('op-passo-mot').classList.remove('hidden');
             document.getElementById('op-passo-lista').classList.add('hidden');
             const {data} = await sb.from('op_motorizacoes').select('id,nome').eq('modelo_id', id).order('col_index');
-            opTodasMots = data || [];
+            // Excluir entradas que não são motorizações reais
+            opTodasMots = (data || []).filter(m => 
+                !m.nome.includes('Recomendado') && 
+                !m.nome.includes('IVA') && 
+                !m.nome.includes('PVP') &&
+                m.nome.trim() !== ''
+            );
             opRenderMots();
         }
 
@@ -664,14 +670,23 @@
             document.getElementById('op-passo-lista').classList.remove('hidden');
             document.getElementById('op-lista').innerHTML = '<p class="text-xs text-gray-400 py-4 text-center">A carregar opcionais...</p>';
 
-            // Carregar todos os opcionais desta motorização com disponibilidade
-            const {data} = await sb
-                .from('op_disponibilidade')
-                .select('tipo, op_opcionais(id,codigo,nome,preco_iva,preco_siva,descricao,regras,op_secoes(nome))')
-                .eq('motorizacao_id', id)
-                .order('tipo');
+            // Carregar TODOS os opcionais desta motorização
+            let allData = [];
+            let from = 0;
+            const pageSize = 1000;
+            while (true) {
+                const {data, error} = await sb
+                    .from('op_disponibilidade')
+                    .select('tipo, op_opcionais(id,codigo,nome,preco_iva,preco_siva,descricao,regras,op_secoes(nome))')
+                    .eq('motorizacao_id', id)
+                    .range(from, from + pageSize - 1);
+                if (!data || data.length === 0) break;
+                allData = allData.concat(data);
+                if (data.length < pageSize) break;
+                from += pageSize;
+            }
 
-            opTodosOpcionais = (data||[]).map(d => ({
+            opTodosOpcionais = allData.map(d => ({
                 ...d.op_opcionais,
                 secao: d.op_opcionais?.op_secoes?.nome || 'Outros',
                 tipo: d.tipo
@@ -683,7 +698,14 @@
         }
 
         function opRenderSecoes() {
-            const secoes = ['Todas', ...new Set(opTodosOpcionais.map(o => o.secao).filter(Boolean))];
+            const raw = [...new Set(opTodosOpcionais.map(o => o.secao).filter(Boolean))];
+            // Sort sections numerically (e.g. "1. Segurança" before "2. Pintura")
+            raw.sort((a, b) => {
+                const na = parseFloat(a.match(/^[\d.]+/)?.[0] || '999');
+                const nb = parseFloat(b.match(/^[\d.]+/)?.[0] || '999');
+                return na - nb;
+            });
+            const secoes = ['Todas', ...raw];
             document.getElementById('op-filtro-secoes').innerHTML = secoes.map(s =>
                 `<button class="serie-btn px-4 py-1.5 rounded-md text-xs ${opSecaoAtiva===s?'active':''}"
                     onclick="opFiltrarSecao('${escapar(s)}')">${s}</button>`
