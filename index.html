@@ -67,6 +67,7 @@
                 <button onclick="mudarTab('dados')" id="tab-dados" class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Dados Técnicos</button>
                 <button onclick="mudarTab('opcionais')" id="tab-opcionais" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Opcionais</button>
                 <button onclick="mudarTab('bev')" id="tab-bev" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Comparador BEV</button>
+                <button onclick="mudarTab('calc')" id="tab-calc" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Calculadora</button>
             </nav>
         </div>
     </header>
@@ -248,6 +249,132 @@
             <div class="overflow-y-auto p-3 flex-1 no-scrollbar" id="bev-modal-lista"></div>
         </div>
     </div>
+
+
+    <!-- ═══════════════════ TAB: CALCULADORA ═══════════════════ -->
+    <div id="conteudo-calc" class="hidden">
+
+        <!-- BLOCO 1: Tempo de carga -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-bmw to-blue-500 px-5 py-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <p class="text-xs font-black text-white uppercase tracking-widest">Tempo de carregamento</p>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Capacidade da bateria (kWh)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-bateria" min="10" max="120" value="75" step="1" oninput="calcAtualizar()" class="flex-1 accent-bmw">
+                            <span id="calc-bateria-val" class="text-base font-black text-bmw w-12 text-right">75</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Potência de carga (kW)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-potencia" min="1" max="350" value="11" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-bmw">
+                            <span id="calc-potencia-val" class="text-base font-black text-bmw w-14 text-right">11</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Estado inicial (%)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-soc-ini" min="0" max="95" value="10" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw">
+                            <span id="calc-soc-ini-val" class="text-base font-black text-bmw w-10 text-right">10%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Estado final (%)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-soc-fin" min="5" max="100" value="100" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw">
+                            <span id="calc-soc-fin-val" class="text-base font-black text-bmw w-10 text-right">100%</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Resultado tempo -->
+                <div class="bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Tempo estimado</p>
+                        <p id="calc-res-tempo" class="text-3xl font-black text-bmw mt-1">—</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia a carregar</p>
+                        <p id="calc-res-energia" class="text-xl font-black text-gray-700 mt-1">—</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 2: Custo de carga -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-green-500 to-green-400 px-5 py-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-xs font-black text-white uppercase tracking-widest">Custo de carregamento</p>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Preço por kWh (€)</p>
+                    <div class="flex items-center gap-2">
+                        <input type="range" id="calc-preco-kwh" min="0.05" max="0.60" value="0.15" step="0.01" oninput="calcAtualizar()" class="flex-1 accent-green-500">
+                        <span id="calc-preco-kwh-val" class="text-base font-black text-green-600 w-14 text-right">0,15 €</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-300 mt-1 px-1">
+                        <span>0,05 €</span><span>Casa (~0,15€)</span><span>Público (~0,40€)</span><span>0,60 €</span>
+                    </div>
+                </div>
+                <!-- Resultados custo -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo total</p>
+                        <p id="calc-res-custo" class="text-2xl font-black text-green-600 mt-1">—</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo / 100 km</p>
+                        <p id="calc-res-custo-100" class="text-2xl font-black text-green-600 mt-1">—</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BLOCO 3: Custo por viagem -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-400 px-5 py-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                <p class="text-xs font-black text-white uppercase tracking-widest">Custo por viagem</p>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Distância (km)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-km" min="10" max="800" value="100" step="10" oninput="calcAtualizar()" class="flex-1 accent-purple-500">
+                            <span id="calc-km-val" class="text-base font-black text-purple-600 w-14 text-right">100</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Consumo (kWh/100km)</p>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="calc-consumo" min="10" max="40" value="20" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-purple-500">
+                            <span id="calc-consumo-val" class="text-base font-black text-purple-600 w-14 text-right">20,0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia usada</p>
+                        <p id="calc-res-viagem-energia" class="text-2xl font-black text-purple-600 mt-1">—</p>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo da viagem</p>
+                        <p id="calc-res-viagem-custo" class="text-2xl font-black text-purple-600 mt-1">—</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /conteudo-calc -->
 
     </main>
 
@@ -573,7 +700,7 @@
         // TABS
         // ══════════════════════════════════════════════════════════
         function mudarTab(tab) {
-            ['dados','opcionais','bev'].forEach(t => {
+            ['dados','opcionais','bev','calc'].forEach(t => {
                 document.getElementById('conteudo-' + t).classList.add('hidden');
                 const b = document.getElementById('tab-' + t);
                 b.classList.remove('border-bmw','text-bmw');
@@ -793,7 +920,7 @@
                 // Show models likely to be BEV
                 const todos=data||[];
                 const bevLista=todos.filter(m=>/\bi4\b|\bix\b|\biX\b|bev|i4|iX/i.test(m.nome)||
-                    ['G26BEV','NA5','I20','U10','U11'].some(c=>m.codigo.toUpperCase()===c));
+                    ['G26BEV','NA5','I20','U10','U11','G60','G61','G70'].some(c=>m.codigo.toUpperCase()===c));
                 const lista=bevLista.length>0?bevLista:todos;
                 document.getElementById('bev-modal-lista').innerHTML=lista.map(m=>`<button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 hover:border-green-400 hover:bg-green-50 transition-colors mb-1" onclick="bevEscolherModelo('${m.id}','${escapar(m.nome)}')"><p class="text-sm font-black text-gray-800">${m.nome}</p><p class="text-xs text-gray-400 font-mono">${m.codigo}</p></button>`).join('');
             });
@@ -870,6 +997,71 @@
                 return`<tr class="border-b border-gray-100 hover:bg-green-50/30 transition-colors"><td class="px-4 py-2.5 text-xs text-gray-600">${ch.label}</td>${vals.map(v=>`<td class="px-3 py-2.5 text-xs font-bold border-l border-gray-100 ${v==='—'?'text-gray-300':ig?'text-gray-800':'text-green-700'}">${v}</td>`).join('')}</tr>`;
             }).join('');
         }
+
+
+        // ══════════════════════════════════════════════════════════
+        // CALCULADORA BEV
+        // ══════════════════════════════════════════════════════════
+        function calcFmt(n, dec=2) {
+            return n.toLocaleString('pt-PT', {minimumFractionDigits: dec, maximumFractionDigits: dec});
+        }
+
+        function calcFormatarTempo(horas) {
+            if (isNaN(horas) || horas <= 0) return '—';
+            const h = Math.floor(horas);
+            const m = Math.round((horas - h) * 60);
+            if (h === 0) return `${m} min`;
+            if (m === 0) return `${h}h`;
+            return `${h}h ${m}min`;
+        }
+
+        function calcAtualizar() {
+            const bateria   = parseFloat(document.getElementById('calc-bateria').value);
+            const potencia  = parseFloat(document.getElementById('calc-potencia').value);
+            const socIni    = parseFloat(document.getElementById('calc-soc-ini').value);
+            const socFin    = parseFloat(document.getElementById('calc-soc-fin').value);
+            const precoKwh  = parseFloat(document.getElementById('calc-preco-kwh').value);
+            const km        = parseFloat(document.getElementById('calc-km').value);
+            const consumo   = parseFloat(document.getElementById('calc-consumo').value);
+
+            // Atualizar labels
+            document.getElementById('calc-bateria-val').innerText    = calcFmt(bateria, 0);
+            document.getElementById('calc-potencia-val').innerText   = calcFmt(potencia, 1);
+            document.getElementById('calc-soc-ini-val').innerText    = socIni + '%';
+            document.getElementById('calc-soc-fin-val').innerText    = socFin + '%';
+            document.getElementById('calc-preco-kwh-val').innerText  = calcFmt(precoKwh) + ' €';
+            document.getElementById('calc-km-val').innerText         = calcFmt(km, 0);
+            document.getElementById('calc-consumo-val').innerText    = calcFmt(consumo, 1);
+
+            // Garantir soc_fin > soc_ini
+            if (socFin <= socIni) {
+                document.getElementById('calc-res-tempo').innerText   = 'Inválido';
+                document.getElementById('calc-res-energia').innerText = '—';
+                return;
+            }
+
+            // ── Bloco 1: Tempo ────────────────────────────────────────
+            const energiaCarregar = bateria * (socFin - socIni) / 100;
+            const horasCarga      = energiaCarregar / potencia;
+            document.getElementById('calc-res-tempo').innerText   = calcFormatarTempo(horasCarga);
+            document.getElementById('calc-res-energia').innerText = calcFmt(energiaCarregar, 1) + ' kWh';
+
+            // ── Bloco 2: Custo de carga ───────────────────────────────
+            const custoCarga     = energiaCarregar * precoKwh;
+            const autonomiaTotal = (bateria / consumo) * 100;
+            const custoPor100km  = autonomiaTotal > 0 ? (custoCarga / autonomiaTotal) * 100 : 0;
+            document.getElementById('calc-res-custo').innerText     = calcFmt(custoCarga) + ' €';
+            document.getElementById('calc-res-custo-100').innerText = calcFmt(custoPor100km) + ' €';
+
+            // ── Bloco 3: Custo por viagem ─────────────────────────────
+            const energiaViagem  = (consumo / 100) * km;
+            const custoViagem    = energiaViagem * precoKwh;
+            document.getElementById('calc-res-viagem-energia').innerText = calcFmt(energiaViagem, 1) + ' kWh';
+            document.getElementById('calc-res-viagem-custo').innerText   = calcFmt(custoViagem) + ' €';
+        }
+
+        // Inicializar calculadora
+        setTimeout(calcAtualizar, 100);
 
     </script>
 </body>
