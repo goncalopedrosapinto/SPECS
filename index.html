@@ -64,7 +64,8 @@
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav class="flex space-x-6 overflow-x-auto no-scrollbar">
-                <button onclick="mudarTab('dados')" id="tab-dados" class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Dados Técnicos</button>
+                <button onclick="mudarTab('genius')" id="tab-genius" class="px-1 py-3 text-sm font-bold border-b-2 border-bmw text-bmw uppercase tracking-widest whitespace-nowrap">Genius</button>
+                <button onclick="mudarTab('dados')" id="tab-dados" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Dados Técnicos</button>
                 <button onclick="mudarTab('opcionais')" id="tab-opcionais" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Opcionais</button>
                 <button onclick="mudarTab('bev')" id="tab-bev" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Comparador BEV</button>
                 <button onclick="mudarTab('calc')" id="tab-calc" class="px-1 py-3 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 uppercase tracking-widest whitespace-nowrap">Calculadora</button>
@@ -427,7 +428,10 @@
         if (error) { mostrarErro(error.message); return; }
         todosModelos = data || [];
         document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('conteudo-dados').classList.remove('hidden');
+        document.getElementById('conteudo-genius').classList.remove('hidden');
+        document.getElementById('tab-genius').classList.add('border-bmw','text-bmw');
+        document.getElementById('tab-genius').classList.remove('border-transparent','text-gray-400');
+        geniusCarregarDados();
         renderizarSeries(todosModelos);
     };
 
@@ -700,7 +704,7 @@
         // TABS
         // ══════════════════════════════════════════════════════════
         function mudarTab(tab) {
-            ['dados','opcionais','bev','calc'].forEach(t => {
+            ['genius','dados','opcionais','bev','calc'].forEach(t => {
                 document.getElementById('conteudo-' + t).classList.add('hidden');
                 const b = document.getElementById('tab-' + t);
                 b.classList.remove('border-bmw','text-bmw');
@@ -711,6 +715,7 @@
             ab.classList.add('border-bmw','text-bmw');
             ab.classList.remove('border-transparent','text-gray-400');
             if (tab === 'opcionais' && opTodosModelos.length === 0) opCarregarModelos();
+            if (tab === 'genius') geniusCarregarDados();
             if (tab === 'bev' && bevModelos.length === 0) bevCarregarModelos();
         }
 
@@ -1062,6 +1067,283 @@
 
         // Inicializar calculadora
         setTimeout(calcAtualizar, 100);
+
+
+        // ══════════════════════════════════════════════════════════
+        // GENIUS — Assistente Digital
+        // ══════════════════════════════════════════════════════════
+        let geniusEspecificacoes = null; // cache de todas as specs
+        let geniusModelos = null;        // cache de modelos
+        let geniusCarregando = false;
+
+        // Carregar todos os dados na memória quando o Genius é ativado
+        async function geniusCarregarDados() {
+            if (geniusModelos) return; // já carregado
+            geniusModelos = {};
+
+            // Carregar modelos
+            const {data: mods} = await sb.from('modelos').select('id,codigo,nome');
+            (mods||[]).forEach(m => { geniusModelos[m.id] = m; });
+
+            // Carregar motorizações
+            const {data: mots} = await sb.from('motorizacoes').select('id,codigo,nome_visual,modelo_id');
+            geniusMotorizacoes = {};
+            (mots||[]).forEach(m => { geniusMotorizacoes[m.id] = m; });
+
+            // Carregar todas as specs (paginado)
+            geniusEspecificacoes = {};
+            let from = 0;
+            while(true) {
+                const {data} = await sb.from('especificacoes').select('chave,valor,motorizacao_id').range(from, from+999);
+                if(!data||data.length===0) break;
+                data.forEach(s => {
+                    if(!geniusEspecificacoes[s.motorizacao_id]) geniusEspecificacoes[s.motorizacao_id] = {};
+                    geniusEspecificacoes[s.motorizacao_id][s.chave] = s.valor;
+                });
+                if(data.length < 1000) break;
+                from += 1000;
+            }
+        }
+
+        let geniusMotorizacoes = {};
+
+        function geniusAdicionarMsg(texto, tipo='bot', html=false) {
+            const msgs = document.getElementById('genius-msgs');
+            const div = document.createElement('div');
+            div.className = 'flex items-start gap-2' + (tipo==='user' ? ' justify-end' : '');
+
+            if(tipo === 'bot') {
+                div.innerHTML = `
+                    <div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-xs sm:max-w-md">
+                        ${html ? texto : '<p class="text-sm text-gray-800 leading-relaxed">' + texto + '</p>'}
+                    </div>`;
+            } else {
+                div.innerHTML = `
+                    <div class="bg-bmw rounded-2xl rounded-tr-none px-4 py-2.5 max-w-xs sm:max-w-md">
+                        <p class="text-sm text-white leading-relaxed">${texto}</p>
+                    </div>`;
+            }
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function geniusAdicionarTyping() {
+            const msgs = document.getElementById('genius-msgs');
+            const div = document.createElement('div');
+            div.id = 'genius-typing';
+            div.className = 'flex items-start gap-2';
+            div.innerHTML = `
+                <div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div>
+                </div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function geniusRemoverTyping() {
+            document.getElementById('genius-typing')?.remove();
+        }
+
+        // Normalizar texto para comparação
+        function norm(s) {
+            return (s||'').toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+                .replace(/[^a-z0-9 ]/g,' ').trim();
+        }
+
+        // Encontrar modelo pela pergunta
+        function geniusEncontrarModelo(pergunta) {
+            const p = norm(pergunta);
+            let melhor = null, melhorScore = 0;
+
+            Object.values(geniusModelos).forEach(m => {
+                const nome = norm(m.nome);
+                const codigo = norm(m.codigo);
+                let score = 0;
+
+                // Verificar código (ex: "x1", "i4", "m5")
+                if(p.includes(codigo)) score += 10;
+
+                // Verificar palavras do nome
+                nome.split(' ').forEach(palavra => {
+                    if(palavra.length >= 2 && p.includes(palavra)) score += 2;
+                });
+
+                // Aliases comuns
+                const aliases = {
+                    'serie 1': ['serie 1','s1','serie1'], 'serie 2': ['serie 2','s2'],
+                    'serie 3': ['serie 3','s3'], 'serie 4': ['serie 4','s4'],
+                    'serie 5': ['serie 5','s5'], 'serie 7': ['serie 7','s7'],
+                    'x1': ['x1'], 'x2': ['x2'], 'x3': ['x3'], 'x4': ['x4'],
+                    'x5': ['x5'], 'x6': ['x6'], 'x7': ['x7'], 'xm': ['xm'],
+                    'i4': ['i4'], 'ix': ['ix ','ix3','ixm'], 'm2': ['m2'],
+                    'm3': ['m3'], 'm4': ['m4'], 'm5': ['m5'],
+                };
+                Object.entries(aliases).forEach(([key, vals]) => {
+                    if(norm(m.nome).includes(key) || norm(m.codigo).includes(key)) {
+                        vals.forEach(v => { if(p.includes(v)) score += 8; });
+                    }
+                });
+
+                if(score > melhorScore) { melhorScore = score; melhor = m; }
+            });
+
+            return melhorScore >= 2 ? melhor : null;
+        }
+
+        // Encontrar chave de especificação
+        function geniusEncontrarChave(pergunta, specs) {
+            const p = norm(pergunta);
+            const chaves = Object.keys(specs);
+
+            // Mapeamento de intenções → palavras-chave das chaves
+            const intencoes = [
+                {palavras:['autonomia','alcance','range','km'],           match:['autonomia','alcance','wltp','km']},
+                {palavras:['potencia','potência','cv','cavalos','kw'],    match:['potencia','cv','kw','motor']},
+                {palavras:['bateria','kwh','capacidade'],                 match:['bateria','kwh','capacidade']},
+                {palavras:['consumo','kw/100','kwh/100'],                 match:['consumo','energia','kwh/100']},
+                {palavras:['velocidade','maxima','veloc'],                match:['velocidade','maxima']},
+                {palavras:['0-100','aceleracao','acelera'],               match:['0-100','aceleracao','seg']},
+                {palavras:['peso','massa'],                               match:['peso','massa','kg']},
+                {palavras:['comprimento','tamanho','dimensao','mm'],      match:['comprimento','mm','dimensao']},
+                {palavras:['porta-malas','bagageira','litros'],           match:['porta-malas','bagageira','litros']},
+                {palavras:['tracao','traccao','4x4','xdrive'],            match:['tracao','traccao']},
+                {palavras:['carregamento','carregar','dc','ac','carga'],  match:['carregamento','carga','dc','ac']},
+                {palavras:['transmissao','caixa','velocidades'],          match:['transmissao','caixa']},
+                {palavras:['cilindrada','motor','cc','litros'],           match:['cilindrada','cc']},
+                {palavras:['binario','nm','torque'],                      match:['binario','nm','torque']},
+            ];
+
+            for(const int of intencoes) {
+                if(int.palavras.some(p2 => p.includes(p2))) {
+                    const found = chaves.filter(k => {
+                        const kn = norm(k);
+                        return int.match.some(m => kn.includes(m));
+                    });
+                    if(found.length > 0) return found;
+                }
+            }
+            return null;
+        }
+
+        // Motor principal de resposta
+        async function geniusResponder(pergunta) {
+            await geniusCarregarDados();
+            const p = norm(pergunta);
+
+            // Pergunta sobre modelos elétricos
+            if(p.includes('eletric') || p.includes('bev') || p.includes('100%')) {
+                const bevModelos = Object.values(geniusModelos).filter(m =>
+                    /i4|ix|bev/i.test(m.nome) || ['G26BEV','NA5','I20'].includes(m.codigo.toUpperCase())
+                );
+                return `Os modelos 100% elétricos disponíveis são:
+${bevModelos.map(m=>'• '+m.nome).join('
+')}`;
+            }
+
+            // Encontrar modelo
+            const modelo = geniusEncontrarModelo(pergunta);
+            if(!modelo) {
+                return 'Não consegui identificar o modelo. Podes especificar? Ex: "autonomia do iX3", "potência do Série 3".';
+            }
+
+            // Encontrar motorizações do modelo
+            const motsDoModelo = Object.values(geniusMotorizacoes).filter(m => m.modelo_id === modelo.id);
+            if(motsDoModelo.length === 0) return `Não encontrei dados técnicos para o ${modelo.nome}.`;
+
+            // Tentar encontrar motorização específica
+            let motsAlvo = motsDoModelo;
+            const motNomes = motsDoModelo.map(m => norm(m.nome_visual || m.codigo));
+            const motEncontrada = motsDoModelo.find(m => {
+                const n = norm(m.nome_visual || m.codigo);
+                return p.includes(n) || n.split(' ').some(w => w.length >= 3 && p.includes(w));
+            });
+            if(motEncontrada) motsAlvo = [motEncontrada];
+
+            // Verificar pergunta geral sobre o modelo
+            if(p.includes('motorizacao') || p.includes('versao') || p.includes('opcoes') || p.includes('quais')) {
+                return `O ${modelo.nome} está disponível nas seguintes motorizações:
+${motsDoModelo.map(m=>'• '+(m.nome_visual||m.codigo)).join('
+')}`;
+            }
+
+            // Encontrar a spec pedida
+            // Tentar em todas as mots alvo
+            const respostas = [];
+            for(const mot of motsAlvo) {
+                const specs = geniusEspecificacoes[mot.id];
+                if(!specs) continue;
+
+                const chavesEncontradas = geniusEncontrarChave(pergunta, specs);
+                if(!chavesEncontradas) continue;
+
+                chavesEncontradas.forEach(chave => {
+                    const valor = specs[chave];
+                    if(valor && valor !== '—') {
+                        respostas.push({mot: mot.nome_visual || mot.codigo, chave, valor});
+                    }
+                });
+            }
+
+            if(respostas.length === 0) {
+                // Tentar mostrar todas as specs relevantes
+                return `Não encontrei essa especificação para o ${modelo.nome}. Podes tentar: autonomia, potência, consumo, bateria, velocidade máxima, 0-100km/h, peso, ou carregamento.`;
+            }
+
+            // Formatar resposta
+            if(respostas.length === 1) {
+                return `No <strong>${modelo.nome}</strong> (${respostas[0].mot}), o valor de <em>${respostas[0].chave}</em> é <strong>${respostas[0].valor}</strong>.`;
+            }
+
+            // Múltiplas motorizações
+            let html = `<p class="text-sm text-gray-800 leading-relaxed mb-2">Para o <strong>${modelo.nome}</strong>:</p><div class="space-y-1">`;
+            respostas.forEach(r => {
+                html += `<div class="flex justify-between items-center py-1 border-b border-gray-200 last:border-0"><span class="text-xs text-gray-500">${r.mot}</span><span class="text-xs font-black text-bmw">${r.valor}</span></div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        async function geniusEnviar() {
+            const input = document.getElementById('genius-input');
+            const pergunta = input.value.trim();
+            if(!pergunta || geniusCarregando) return;
+
+            input.value = '';
+            geniusCarregando = true;
+
+            // Mostrar mensagem do utilizador
+            geniusAdicionarMsg(pergunta, 'user');
+            geniusAdicionarTyping();
+
+            // Aguardar um momento para simular resposta
+            await new Promise(r => setTimeout(r, 600));
+
+            try {
+                const resposta = await geniusResponder(pergunta);
+                geniusRemoverTyping();
+                const isHtml = resposta.includes('<');
+                geniusAdicionarMsg(isHtml ? resposta : resposta.replace(/\n/g,'<br>'), 'bot', isHtml || resposta.includes('<br>'));
+            } catch(e) {
+                geniusRemoverTyping();
+                geniusAdicionarMsg('Ocorreu um erro. Tenta novamente.', 'bot');
+            }
+
+            geniusCarregando = false;
+        }
+
+        function geniusPergunta(texto) {
+            document.getElementById('genius-input').value = texto;
+            geniusEnviar();
+        }
 
     </script>
 </body>
