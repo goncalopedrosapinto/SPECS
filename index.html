@@ -75,19 +75,8 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- LOADING -->
-        <div id="loading-state" class="flex items-center justify-center py-20">
-            <div class="w-5 h-5 border-2 border-bmw border-t-transparent rounded-full animate-spin mr-3"></div>
-            <span class="text-sm font-bold uppercase tracking-widest text-gray-400">A carregar...</span>
-        </div>
-
-        <!-- ERRO -->
-        <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-medium mb-5"></div>
-
-        <!-- TABS CONTENT -->
-
-        <!-- ═══ GENIUS ═══ -->
-        <div id="conteudo-genius" class="hidden">
+        <!-- GENIUS TAB -->
+        <div id="tab-genius-content">
             <div class="bg-gradient-to-r from-gray-900 to-bmw rounded-2xl p-5 mb-4 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
@@ -129,10 +118,32 @@
             </div>
         </div>
 
-        <!-- ═══ DADOS TÉCNICOS ═══ -->
-        <div id="conteudo-dados" class="hidden">
+        <!-- DADOS TECNICOS TAB (search bar + content below) -->
+        <div id="tab-dados-content" class="hidden">
+        <!-- BARRA DE PESQUISA + IVA -->
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-5 flex items-center gap-3">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/BMW_logo_%28gray%29.svg" alt="BMW" class="h-7 flex-shrink-0 hidden sm:block">
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                </svg>
+                <input type="text" id="pesquisa" placeholder="Inserir código ou palavra para pesquisa"
+                    oninput="pesquisar()"
+                    class="search-input w-full border border-gray-200 rounded-lg pl-9 pr-4 py-2.5 text-sm bg-gray-50">
+            </div>
 
-        <!-- CONTEÚDO ORIGINAL -->
+        </div>
+
+        <!-- LOADING -->
+        <div id="loading-state" class="flex items-center justify-center py-20">
+            <div class="w-5 h-5 border-2 border-bmw border-t-transparent rounded-full animate-spin mr-3"></div>
+            <span class="text-sm font-bold uppercase tracking-widest text-gray-400">A carregar...</span>
+        </div>
+
+        <!-- ERRO -->
+        <div id="error-state" class="hidden bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-medium mb-5"></div>
+
+        <!-- CONTEÚDO -->
         <div id="main-content" class="hidden">
 
             <!-- FILTRO NÍVEL 1: Séries -->
@@ -186,151 +197,7 @@
         </div>
     </main>
 
-        </div><!-- /main-content -->
-        </div><!-- /conteudo-dados -->
-
-        <!-- ═══ OPCIONAIS ═══ -->
-        <div id="conteudo-opcionais" class="hidden">
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-4 flex items-center gap-3">
-                <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
-                <input type="text" id="op-pesquisa" placeholder="Pesquisar modelo..." oninput="opPesquisar()" class="flex-1 text-sm outline-none bg-transparent">
-            </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-3">
-                <div class="flex flex-wrap gap-2" id="op-filtro-series"></div>
-            </div>
-            <div id="op-filtro-modelos-wrap" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-4">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Outras categorias</p>
-                <div class="flex flex-wrap gap-2" id="op-filtro-modelos"></div>
-            </div>
-            <div id="op-passo-mot" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-4">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center">2</span>
-                        <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Motorização</span>
-                        <span id="op-modelo-label" class="text-xs font-bold text-bmw bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full"></span>
-                    </div>
-                    <button onclick="opLimpar()" class="text-xs text-gray-400 hover:text-red-500 font-bold">Limpar</button>
-                </div>
-                <div id="op-grid-mots" class="flex flex-wrap gap-2"></div>
-            </div>
-            <div id="op-passo-lista" class="hidden">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="w-6 h-6 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center">3</span>
-                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Opcionais</span>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-4 overflow-x-auto no-scrollbar">
-                    <div class="flex gap-2 flex-wrap" id="op-filtro-secoes"></div>
-                </div>
-                <div id="op-lista" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- MODAL opcional -->
-        <div id="op-modal" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden" style="max-height:85vh">
-                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <div><p id="op-modal-codigo" class="text-xs font-bold text-bmw font-mono"></p><h2 id="op-modal-nome" class="text-base font-black text-gray-800 mt-0.5"></h2></div>
-                    <button onclick="opFecharModal()" class="text-gray-400 hover:text-red-500 text-xl font-bold ml-4">✕</button>
-                </div>
-                <div class="overflow-y-auto p-5 space-y-4 no-scrollbar">
-                    <div id="op-modal-preco-wrap" class="hidden bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center justify-between">
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Preço c/ IVA</p><p id="op-modal-preco-iva" class="text-xl font-black text-bmw mt-0.5"></p></div>
-                        <div class="text-right"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Preço s/ IVA</p><p id="op-modal-preco-siva" class="text-sm font-bold text-gray-600 mt-0.5"></p></div>
-                    </div>
-                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Disponibilidade</p><div id="op-modal-disponib" class="flex flex-wrap gap-2"></div></div>
-                    <div id="op-modal-desc-wrap" class="hidden"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Descrição</p><p id="op-modal-desc" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line"></p></div>
-                    <div id="op-modal-regras-wrap" class="hidden"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Regras</p><p id="op-modal-regras" class="text-sm text-gray-500 leading-relaxed whitespace-pre-line"></p></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ═══ COMPARADOR BEV ═══ -->
-        <div id="conteudo-bev" class="hidden">
-            <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3 mb-5 flex items-center gap-2">
-                <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                <p class="text-xs font-bold text-green-700">Selecione até 4 motorizações BEV para comparar lado a lado.</p>
-            </div>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6" id="bev-slots"></div>
-            <div id="bev-tabela-wrap" class="hidden">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Comparação BEV — verde = valores diferentes</p>
-                    <button onclick="bevLimpar()" class="text-xs text-gray-400 hover:text-red-500 font-bold uppercase tracking-widest">Limpar tudo</button>
-                </div>
-                <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto no-scrollbar">
-                        <table class="w-full text-sm" style="min-width:400px">
-                            <thead id="bev-thead"></thead>
-                            <tbody id="bev-tbody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL BEV -->
-        <div id="bev-modal" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden" style="max-height:85vh">
-                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h2 id="bev-modal-titulo" class="text-sm font-black text-gray-800 uppercase tracking-widest">Escolher Modelo BEV</h2>
-                    <button onclick="bevFecharModal()" class="text-gray-400 hover:text-red-500 text-lg font-bold">✕</button>
-                </div>
-                <input type="hidden" id="bev-modal-slot" value="0">
-                <div class="overflow-y-auto p-3 flex-1 no-scrollbar" id="bev-modal-lista"></div>
-            </div>
-        </div>
-
-        <!-- ═══ CALCULADORA ═══ -->
-        <div id="conteudo-calc" class="hidden">
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
-                <div class="bg-gradient-to-r from-bmw to-blue-500 px-5 py-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    <p class="text-xs font-black text-white uppercase tracking-widest">Tempo de carregamento</p>
-                </div>
-                <div class="p-5 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Bateria (kWh)</p><div class="flex items-center gap-2"><input type="range" id="calc-bateria" min="10" max="120" value="75" step="1" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-bateria-val" class="text-base font-black text-bmw w-12 text-right">75</span></div></div>
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Potência (kW)</p><div class="flex items-center gap-2"><input type="range" id="calc-potencia" min="1" max="350" value="11" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-potencia-val" class="text-base font-black text-bmw w-14 text-right">11</span></div></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">SOC inicial (%)</p><div class="flex items-center gap-2"><input type="range" id="calc-soc-ini" min="0" max="95" value="10" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-soc-ini-val" class="text-base font-black text-bmw w-10 text-right">10%</span></div></div>
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">SOC final (%)</p><div class="flex items-center gap-2"><input type="range" id="calc-soc-fin" min="5" max="100" value="100" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-soc-fin-val" class="text-base font-black text-bmw w-10 text-right">100%</span></div></div>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 flex items-center justify-between">
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Tempo estimado</p><p id="calc-res-tempo" class="text-3xl font-black text-bmw mt-1">—</p></div>
-                        <div class="text-right"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia</p><p id="calc-res-energia" class="text-xl font-black text-gray-700 mt-1">—</p></div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
-                <div class="bg-gradient-to-r from-green-500 to-green-400 px-5 py-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <p class="text-xs font-black text-white uppercase tracking-widest">Custo de carregamento</p>
-                </div>
-                <div class="p-5 space-y-4">
-                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Preço por kWh (€)</p><div class="flex items-center gap-2"><input type="range" id="calc-preco-kwh" min="0.05" max="0.60" value="0.15" step="0.01" oninput="calcAtualizar()" class="flex-1 accent-green-500"><span id="calc-preco-kwh-val" class="text-base font-black text-green-600 w-14 text-right">0,15 €</span></div><div class="flex justify-between text-xs text-gray-300 mt-1 px-1"><span>0,05€</span><span>Casa ~0,15€</span><span>Público ~0,40€</span><span>0,60€</span></div></div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo total</p><p id="calc-res-custo" class="text-2xl font-black text-green-600 mt-1">—</p></div>
-                        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo / 100 km</p><p id="calc-res-custo-100" class="text-2xl font-black text-green-600 mt-1">—</p></div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
-                <div class="bg-gradient-to-r from-purple-500 to-purple-400 px-5 py-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
-                    <p class="text-xs font-black text-white uppercase tracking-widest">Custo por viagem</p>
-                </div>
-                <div class="p-5 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Distância (km)</p><div class="flex items-center gap-2"><input type="range" id="calc-km" min="10" max="800" value="100" step="10" oninput="calcAtualizar()" class="flex-1 accent-purple-500"><span id="calc-km-val" class="text-base font-black text-purple-600 w-14 text-right">100</span></div></div>
-                        <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Consumo (kWh/100km)</p><div class="flex items-center gap-2"><input type="range" id="calc-consumo" min="10" max="40" value="20" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-purple-500"><span id="calc-consumo-val" class="text-base font-black text-purple-600 w-14 text-right">20,0</span></div></div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia usada</p><p id="calc-res-viagem-energia" class="text-2xl font-black text-purple-600 mt-1">—</p></div>
-                        <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo da viagem</p><p id="calc-res-viagem-custo" class="text-2xl font-black text-purple-600 mt-1">—</p></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </div><!-- /tab-dados-content -->
 
     <!-- BARRA FLUTUANTE MOBILE -->
     <div id="compare-bar" class="hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t-2 border-bmw shadow-2xl px-4 py-3">
@@ -381,9 +248,7 @@
         if (error) { mostrarErro(error.message); return; }
         todosModelos = data || [];
         document.getElementById('loading-state').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
         renderizarSeries(todosModelos);
-        // Show genius tab first
         mudarTab('genius');
         geniusCarregarDados();
     };
@@ -653,35 +518,42 @@
 
     function escapar(s) { return (s||'').replace(/'/g, "\\'"); }
 
-        // ══════════════════════════════════════════════════════════
-        // TABS
-        // ══════════════════════════════════════════════════════════
+        // ── TABS ──────────────────────────────────────────────────────────────
+        const TAB_IDS = {
+            'genius':   'tab-genius-content',
+            'dados':    'main-content',
+            'opcionais':'tab-opcionais-content',
+            'bev':      'tab-bev-content',
+            'calc':     'tab-calc-content',
+        };
+
         function mudarTab(tab) {
-            ['genius','dados','opcionais','bev','calc'].forEach(t => {
-                const el = document.getElementById('conteudo-' + t);
+            // Hide all
+            Object.values(TAB_IDS).forEach(id => {
+                const el = document.getElementById(id);
                 if (el) el.classList.add('hidden');
+            });
+            // Deactivate all nav buttons
+            ['genius','dados','opcionais','bev','calc'].forEach(t => {
                 const b = document.getElementById('tab-' + t);
                 if (b) { b.classList.remove('border-bmw','text-bmw'); b.classList.add('border-transparent','text-gray-400'); }
             });
-            // dados tab uses main-content wrapper
-            if (tab === 'dados') {
-                document.getElementById('conteudo-dados').classList.remove('hidden');
-            } else {
-                const el = document.getElementById('conteudo-' + tab);
-                if (el) el.classList.remove('hidden');
-            }
+            // Show target
+            const targetId = TAB_IDS[tab];
+            const el = document.getElementById(targetId);
+            if (el) el.classList.remove('hidden');
+            // Activate nav button
             const ab = document.getElementById('tab-' + tab);
             if (ab) { ab.classList.add('border-bmw','text-bmw'); ab.classList.remove('border-transparent','text-gray-400'); }
+            // Side effects
             if (tab === 'opcionais' && opTodosModelos.length === 0) opCarregarModelos();
             if (tab === 'bev') bevRenderSlots();
             if (tab === 'calc') setTimeout(calcAtualizar, 50);
             if (tab === 'genius') geniusCarregarDados();
         }
 
-        // ══════════════════════════════════════════════════════════
-        // GENIUS
-        // ══════════════════════════════════════════════════════════
-        let geniusModelos = null, geniusMotorizacoes = {}, geniusEspecificacoes = null, geniusCarregando = false;
+        // ── GENIUS ────────────────────────────────────────────────────────────
+        let geniusModelos = null, geniusMotorizacoes = {}, geniusEspecificacoes = null, geniusLoading = false;
 
         async function geniusCarregarDados() {
             if (geniusModelos) return;
@@ -704,14 +576,14 @@
             }
         }
 
-        function geniusAdicionarMsg(texto, tipo='bot', isHtml=false) {
+        function geniusMsg(texto, tipo, isHtml) {
             const msgs = document.getElementById('genius-msgs');
             const div = document.createElement('div');
             div.className = 'flex items-start gap-2' + (tipo==='user' ? ' justify-end' : '');
             if (tipo === 'bot') {
-                div.innerHTML = `<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-xs sm:max-w-md">${isHtml ? texto : '<p class="text-sm text-gray-800 leading-relaxed">' + texto.replace(/\n/g,'<br>') + '</p>'}</div>`;
+                div.innerHTML = '<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-xs sm:max-w-md">' + (isHtml ? texto : '<p class="text-sm text-gray-800 leading-relaxed">' + texto.replace(/\n/g,'<br>') + '</p>') + '</div>';
             } else {
-                div.innerHTML = `<div class="bg-bmw rounded-2xl rounded-tr-none px-4 py-2.5 max-w-xs sm:max-w-md"><p class="text-sm text-white leading-relaxed">${texto}</p></div>`;
+                div.innerHTML = '<div class="bg-bmw rounded-2xl rounded-tr-none px-4 py-2.5 max-w-xs sm:max-w-md"><p class="text-sm text-white">' + texto + '</p></div>';
             }
             msgs.appendChild(div);
             msgs.scrollTop = msgs.scrollHeight;
@@ -724,13 +596,13 @@
             const div = document.createElement('div');
             div.id = 'genius-typing';
             div.className = 'flex items-start gap-2';
-            div.innerHTML = `<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div></div>`;
+            div.innerHTML = '<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div></div>';
             msgs.appendChild(div);
             msgs.scrollTop = msgs.scrollHeight;
         }
 
         function norm(s) {
-            return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
+            return (s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
         }
 
         function geniusEncontrarModelo(p) {
@@ -741,10 +613,8 @@
                 const nome = norm(m.nome), cod = norm(m.codigo);
                 if (p.includes(cod)) score += 10;
                 nome.split(' ').forEach(w => { if (w.length >= 2 && p.includes(w)) score += 2; });
-                const aliases = {'serie 1':['serie 1','s1'],'serie 2':['serie 2','s2'],'serie 3':['serie 3','s3'],'serie 4':['serie 4','s4'],'serie 5':['serie 5','s5'],'serie 7':['serie 7','s7'],'x1':['x1'],'x2':['x2'],'x3':['x3'],'x4':['x4'],'x5':['x5'],'x6':['x6'],'x7':['x7'],'xm':['xm'],'i4':['i4'],'ix':['ix'],'ix3':['ix3'],'m2':['m2'],'m3':['m3'],'m4':['m4'],'m5':['m5'],'z4':['z4']};
-                Object.entries(aliases).forEach(([key, vals]) => {
-                    if (nome.includes(key) || cod.includes(key)) vals.forEach(v => { if (p.includes(v)) score += 8; });
-                });
+                const al = {'serie 1':['serie 1'],'serie 2':['serie 2'],'serie 3':['serie 3'],'serie 4':['serie 4'],'serie 5':['serie 5'],'serie 7':['serie 7'],'x1':['x1'],'x2':['x2'],'x3':['x3'],'x4':['x4'],'x5':['x5'],'x6':['x6'],'x7':['x7'],'xm':['xm'],'i4':['i4'],'ix':['ix'],'ix3':['ix3'],'m2':['m2'],'m3':['m3'],'m4':['m4'],'m5':['m5'],'z4':['z4']};
+                Object.entries(al).forEach(([k,vs]) => { if(nome.includes(k)||cod.includes(k)) vs.forEach(v=>{if(p.includes(v))score+=8;}); });
                 if (score > bestScore) { bestScore = score; best = m; }
             });
             return bestScore >= 2 ? best : null;
@@ -753,25 +623,25 @@
         function geniusEncontrarChave(p, specs) {
             p = norm(p);
             const chaves = Object.keys(specs);
-            const intencoes = [
-                {palavras:['autonomia','alcance','range','km autonomia'],match:['autonomia','alcance','wltp']},
-                {palavras:['potencia','potência','cv','cavalos'],match:['potencia','cv','kw','motor']},
-                {palavras:['bateria','kwh','capacidade bateria'],match:['bateria','kwh','capacidade']},
-                {palavras:['consumo','kwh/100'],match:['consumo','energia','kwh/100']},
-                {palavras:['velocidade','maxima','veloc max'],match:['velocidade','maxima']},
-                {palavras:['0-100','aceleracao','acelera'],match:['0-100','aceleracao','seg']},
-                {palavras:['peso','massa kg'],match:['peso','massa','kg']},
-                {palavras:['comprimento','tamanho','dimensao'],match:['comprimento','mm','dimensao']},
-                {palavras:['porta-malas','bagageira','litros'],match:['porta-malas','bagageira','litros']},
-                {palavras:['tracao','4x4','xdrive'],match:['tracao','traccao']},
-                {palavras:['carregamento','carregar','carga dc','carga ac'],match:['carregamento','carga','dc','ac']},
-                {palavras:['transmissao','caixa','velocidades'],match:['transmissao','caixa']},
-                {palavras:['cilindrada','cc'],match:['cilindrada','cc']},
-                {palavras:['binario','nm','torque'],match:['binario','nm','torque']},
+            const ints = [
+                {pw:['autonomia','alcance'],m:['autonomia','alcance','wltp']},
+                {pw:['potencia','cv','cavalos'],m:['potencia','cv','kw','motor']},
+                {pw:['bateria','kwh','capacidade'],m:['bateria','kwh','capacidade']},
+                {pw:['consumo'],m:['consumo','energia','kwh/100']},
+                {pw:['velocidade','maxima'],m:['velocidade','maxima']},
+                {pw:['0-100','aceleracao'],m:['0-100','seg']},
+                {pw:['peso','massa'],m:['peso','massa','kg']},
+                {pw:['comprimento','tamanho'],m:['comprimento','mm']},
+                {pw:['porta-malas','bagageira'],m:['porta-malas','bagageira','litros']},
+                {pw:['tracao','xdrive'],m:['tracao','traccao']},
+                {pw:['carregamento','carregar','carga'],m:['carregamento','carga','dc','ac']},
+                {pw:['transmissao','caixa'],m:['transmissao','caixa']},
+                {pw:['cilindrada'],m:['cilindrada','cc']},
+                {pw:['binario','torque'],m:['binario','nm','torque']},
             ];
-            for (const int of intencoes) {
-                if (int.palavras.some(pw => p.includes(pw))) {
-                    const found = chaves.filter(k => { const kn = norm(k); return int.match.some(m => kn.includes(m)); });
+            for (const i of ints) {
+                if (i.pw.some(pw => p.includes(pw))) {
+                    const found = chaves.filter(k => { const kn = norm(k); return i.m.some(m => kn.includes(m)); });
                     if (found.length > 0) return found;
                 }
             }
@@ -781,170 +651,92 @@
         async function geniusResponder(pergunta) {
             await geniusCarregarDados();
             const p = norm(pergunta);
-
-            if (p.includes('eletric') || p.includes('bev') || p.includes('100%') || p.includes('eletricos')) {
+            if (p.includes('eletric') || p.includes('bev')) {
                 const bevs = Object.values(geniusModelos).filter(m => /i4|ix|bev/i.test(m.nome) || ['G26BEV','NA5','I20','G60','G61','G70'].includes(m.codigo.toUpperCase()));
-                if (bevs.length > 0) return {text: 'Os modelos com versões 100% elétricas são:
-' + bevs.map(m=>'• '+m.nome).join('
-')};
+                if (bevs.length > 0) return {text: 'Modelos com vers\u00f5es 100% el\u00e9tricas:\n' + bevs.map(m=>'- '+m.nome).join('\n')};
             }
-
             const modelo = geniusEncontrarModelo(pergunta);
-            if (!modelo) return {text: 'Não identifiquei o modelo. Podes especificar? Ex: "autonomia do iX3", "potência do M5".'};
-
-            const motsDoModelo = Object.values(geniusMotorizacoes).filter(m => m.modelo_id === modelo.id);
-            if (motsDoModelo.length === 0) return {text: `Não encontrei dados para o ${modelo.nome}.`};
-
-            if (p.includes('motorizac') || p.includes('versao') || p.includes('versoes') || p.includes('opcoes') || (p.includes('quais') && !p.includes('autonomia') && !p.includes('potencia'))) {
-                return {text: `O ${modelo.nome} tem ${motsDoModelo.length} motorização(ões):
-` + motsDoModelo.map(m=>'• '+(m.nome_visual||m.codigo)).join('
-')};
+            if (!modelo) return {text: 'N\u00e3o identifiquei o modelo. Ex: "autonomia do iX3", "pot\u00eancia do M5".'};
+            const mots = Object.values(geniusMotorizacoes).filter(m => m.modelo_id === modelo.id);
+            if (mots.length === 0) return {text: 'Sem dados para ' + modelo.nome};
+            if (p.includes('motorizac') || p.includes('versao') || p.includes('versoes')) {
+                return {text: modelo.nome + ':\n' + mots.map(m=>'- '+(m.nome_visual||m.codigo)).join('\n')};
             }
-
-            let motsAlvo = motsDoModelo;
-            const motEncontrada = motsDoModelo.find(m => { const n = norm(m.nome_visual||m.codigo); return p.includes(n) || n.split(' ').some(w => w.length >= 3 && p.includes(w)); });
-            if (motEncontrada) motsAlvo = [motEncontrada];
-
+            let motsAlvo = mots;
+            const m2 = mots.find(m => { const n=norm(m.nome_visual||m.codigo); return p.includes(n)||n.split(' ').some(w=>w.length>=3&&p.includes(w)); });
+            if (m2) motsAlvo = [m2];
             const respostas = [];
             for (const mot of motsAlvo) {
                 const specs = geniusEspecificacoes[mot.id];
                 if (!specs) continue;
-                const chavesEncontradas = geniusEncontrarChave(pergunta, specs);
-                if (!chavesEncontradas) continue;
-                chavesEncontradas.forEach(chave => {
-                    const valor = specs[chave];
-                    if (valor && valor !== '—') respostas.push({mot: mot.nome_visual||mot.codigo, chave, valor});
-                });
+                const chaves = geniusEncontrarChave(pergunta, specs);
+                if (!chaves) continue;
+                chaves.forEach(chave => { const v=specs[chave]; if(v&&v!=='—') respostas.push({mot:mot.nome_visual||mot.codigo,chave,valor:v}); });
             }
-
-            if (respostas.length === 0) return {text: `Não encontrei essa especificação para o ${modelo.nome}.
-Podes perguntar: autonomia, potência, consumo, bateria, velocidade, 0-100, peso, tração, carregamento.`};
-
-            if (respostas.length === 1) return {text: `${modelo.nome} (${respostas[0].mot})
-${respostas[0].chave}: <strong>${respostas[0].valor}</strong>`, html: true};
-
-            let html = `<p class="text-sm font-black text-gray-800 mb-2">${modelo.nome}</p><div class="space-y-1">`;
-            respostas.forEach(r => { html += `<div class="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-0"><span class="text-xs text-gray-500 flex-1">${r.mot}</span><span class="text-xs font-black text-bmw ml-2">${r.valor}</span></div>`; });
+            if (respostas.length === 0) return {text: 'N\u00e3o encontrei essa especifica\u00e7\u00e3o para o '+modelo.nome+'.\nTenta: autonomia, pot\u00eancia, consumo, bateria, velocidade, 0-100, peso.'};
+            if (respostas.length === 1) return {text: modelo.nome+' ('+respostas[0].mot+')\n'+respostas[0].chave+': '+respostas[0].valor};
+            let html = '<p class="text-sm font-black text-gray-800 mb-2">'+modelo.nome+'</p><div class="space-y-1">';
+            respostas.forEach(r => { html += '<div class="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-0"><span class="text-xs text-gray-500 flex-1">'+r.mot+'</span><span class="text-xs font-black text-bmw ml-2">'+r.valor+'</span></div>'; });
             html += '</div>';
             return {html};
         }
 
         async function geniusEnviar() {
             const input = document.getElementById('genius-input');
-            const pergunta = input.value.trim();
-            if (!pergunta || geniusCarregando) return;
+            const q = input.value.trim();
+            if (!q || geniusLoading) return;
             input.value = '';
-            geniusCarregando = true;
-            geniusAdicionarMsg(pergunta, 'user');
+            geniusLoading = true;
+            geniusMsg(q, 'user', false);
             geniusTyping(true);
             await new Promise(r => setTimeout(r, 500));
             try {
-                const resp = await geniusResponder(pergunta);
+                const resp = await geniusResponder(q);
                 geniusTyping(false);
-                if (resp.html) geniusAdicionarMsg(resp.html, 'bot', true);
-                else geniusAdicionarMsg(resp.text || resp, 'bot', !!(resp.html));
-            } catch(e) {
-                geniusTyping(false);
-                geniusAdicionarMsg('Ocorreu um erro. Tenta novamente.', 'bot');
-            }
-            geniusCarregando = false;
+                if (resp.html) geniusMsg(resp.html, 'bot', true);
+                else geniusMsg(resp.text||'', 'bot', false);
+            } catch(e) { geniusTyping(false); geniusMsg('Erro. Tenta novamente.', 'bot', false); }
+            geniusLoading = false;
         }
 
-        function geniusPergunta(texto) { document.getElementById('genius-input').value = texto; geniusEnviar(); }
+        function geniusPergunta(t) { document.getElementById('genius-input').value=t; geniusEnviar(); }
 
-        // ══════════════════════════════════════════════════════════
-        // OPCIONAIS
-        // ══════════════════════════════════════════════════════════
+        // ── OPCIONAIS ─────────────────────────────────────────────────────────
         let opTodosModelos=[], opSerieAtiva=null, opMotAtiva=null, opTodasMots=[], opTodosOpcionais=[], opSecaoAtiva='Todas';
-        const OP_SERIES=[{label:'1',fn:n=>/série 1|series 1|m135|m140/i.test(n)},{label:'2',fn:n=>/série 2|series 2|m2/i.test(n)},{label:'3',fn:n=>/série 3|series 3|m3/i.test(n)},{label:'4',fn:n=>/série 4|series 4|m4|i4/i.test(n)},{label:'5',fn:n=>/série 5|series 5|m5/i.test(n)},{label:'7',fn:n=>/série 7|series 7/i.test(n)},{label:'X',fn:n=>/x1|x2|x3|x4|x5|x6|x7|xm|ix|ix3/i.test(n)},{label:'Z',fn:n=>/z4/i.test(n)}];
+        const OP_SERIES=[{label:'1',fn:n=>/s\u00e9rie 1|series 1/i.test(n)},{label:'2',fn:n=>/s\u00e9rie 2|series 2|\bm2\b/i.test(n)},{label:'3',fn:n=>/s\u00e9rie 3|series 3|\bm3\b/i.test(n)},{label:'4',fn:n=>/s\u00e9rie 4|series 4|\bm4\b|\bi4\b/i.test(n)},{label:'5',fn:n=>/s\u00e9rie 5|series 5|\bm5\b/i.test(n)},{label:'7',fn:n=>/s\u00e9rie 7|series 7/i.test(n)},{label:'X',fn:n=>/\bx1\b|\bx2\b|\bx3\b|\bx4\b|\bx5\b|\bx6\b|\bx7\b|\bxm\b|\bix\b|\bix3\b/i.test(n)},{label:'Z',fn:n=>/\bz4\b/i.test(n)}];
         function opGetSerie(n){for(const s of OP_SERIES)if(s.fn(n))return s.label;return 'Outros';}
         async function opCarregarModelos(){const{data}=await sb.from('op_modelos').select('id,codigo,nome').order('nome');opTodosModelos=data||[];opRenderSeries();}
-        function opRenderSeries(lista){lista=lista||opTodosModelos;const p=new Set(lista.map(m=>opGetSerie(m.nome)));const ord=['1','2','3','4','5','7','X','Z','Outros'];document.getElementById('op-filtro-series').innerHTML=ord.filter(s=>p.has(s)).map(s=>`<button class="serie-btn px-5 py-2 rounded-md text-sm ${opSerieAtiva===s?'active':''}" onclick="opClicarSerie('${s}')">${s}</button>`).join('');}
-        function opClicarSerie(serie){opSerieAtiva=serie;opMotAtiva=null;opRenderSeries();const modelos=opTodosModelos.filter(m=>opGetSerie(m.nome)===serie);document.getElementById('op-filtro-modelos').innerHTML=modelos.map(m=>`<button class="modelo-btn px-4 py-2 rounded-md text-xs" id="op-mb-${m.id}" onclick="opClicarModelo('${m.id}','${escapar(m.nome)}')">${m.nome}</button>`).join('');document.getElementById('op-filtro-modelos-wrap').classList.remove('hidden');document.getElementById('op-passo-mot').classList.add('hidden');document.getElementById('op-passo-lista').classList.add('hidden');}
+        function opRenderSeries(lista){lista=lista||opTodosModelos;const p=new Set(lista.map(m=>opGetSerie(m.nome)));const ord=['1','2','3','4','5','7','X','Z','Outros'];document.getElementById('op-filtro-series').innerHTML=ord.filter(s=>p.has(s)).map(s=>'<button class="serie-btn px-5 py-2 rounded-md text-sm '+(opSerieAtiva===s?'active':'')+'" onclick="opClicarSerie(\''+s+'\'">'+s+'</button>').join('');}
+        function opClicarSerie(s){opSerieAtiva=s;opMotAtiva=null;opRenderSeries();const m=opTodosModelos.filter(x=>opGetSerie(x.nome)===s);document.getElementById('op-filtro-modelos').innerHTML=m.map(x=>'<button class="modelo-btn px-4 py-2 rounded-md text-xs" id="op-mb-'+x.id+'" onclick="opClicarModelo(\''+x.id+'\',\''+escapar(x.nome)+'\')">'+x.nome+'</button>').join('');document.getElementById('op-filtro-modelos-wrap').classList.remove('hidden');document.getElementById('op-passo-mot').classList.add('hidden');document.getElementById('op-passo-lista').classList.add('hidden');}
         async function opClicarModelo(id,nome){opMotAtiva=null;document.querySelectorAll('[id^="op-mb-"]').forEach(b=>b.classList.remove('active'));document.getElementById('op-mb-'+id)?.classList.add('active');document.getElementById('op-modelo-label').innerText=nome;document.getElementById('op-grid-mots').innerHTML='<span class="text-xs text-gray-400">A carregar...</span>';document.getElementById('op-passo-mot').classList.remove('hidden');document.getElementById('op-passo-lista').classList.add('hidden');const{data}=await sb.from('op_motorizacoes').select('id,nome').eq('modelo_id',id).order('col_index');opTodasMots=(data||[]).filter(m=>!m.nome.includes('Recomendado')&&!m.nome.includes('IVA')&&!m.nome.includes('PVP'));opRenderMots();}
-        function opRenderMots(){document.getElementById('op-grid-mots').innerHTML=opTodasMots.map(m=>`<button class="mot-pill rounded-full px-4 py-2 text-xs font-bold ${opMotAtiva===m.id?'active':''}" onclick="opClicarMot('${m.id}')">${m.nome}</button>`).join('');}
+        function opRenderMots(){document.getElementById('op-grid-mots').innerHTML=opTodasMots.map(m=>'<button class="mot-pill rounded-full px-4 py-2 text-xs font-bold '+(opMotAtiva===m.id?'active':'')+'" onclick="opClicarMot(\''+m.id+'\')">'+m.nome+'</button>').join('');}
         async function opClicarMot(id){opMotAtiva=id;opRenderMots();document.getElementById('op-passo-lista').classList.remove('hidden');document.getElementById('op-lista').innerHTML='<p class="text-xs text-gray-400 py-4 text-center">A carregar...</p>';let all=[],from=0;while(true){const{data}=await sb.from('op_disponibilidade').select('tipo,op_opcionais(id,codigo,nome,preco_iva,preco_siva,descricao,regras,op_secoes(nome))').eq('motorizacao_id',id).range(from,from+999);if(!data||data.length===0)break;all=all.concat(data);if(data.length<1000)break;from+=1000;}opTodosOpcionais=all.map(d=>({...d.op_opcionais,secao:d.op_opcionais?.op_secoes?.nome||'Outros',tipo:d.tipo}));opSecaoAtiva='Todas';opRenderSecoes();opRenderLista();}
-        function opRenderSecoes(){const raw=[...new Set(opTodosOpcionais.map(o=>o.secao).filter(Boolean))];raw.sort((a,b)=>{const na=parseFloat(a.match(/^[\d.]+/)?.[0]||'999'),nb=parseFloat(b.match(/^[\d.]+/)?.[0]||'999');return na-nb;});document.getElementById('op-filtro-secoes').innerHTML=['Todas',...raw].map(s=>`<button class="serie-btn px-4 py-1.5 rounded-md text-xs ${opSecaoAtiva===s?'active':''}" onclick="opFiltrarSecao('${escapar(s)}')">${s}</button>`).join('');}
+        function opRenderSecoes(){const raw=[...new Set(opTodosOpcionais.map(o=>o.secao).filter(Boolean))];raw.sort((a,b)=>{const na=parseFloat(a.match(/^[\d.]+/)?.[0]||'999'),nb=parseFloat(b.match(/^[\d.]+/)?.[0]||'999');return na-nb;});document.getElementById('op-filtro-secoes').innerHTML=['Todas',...raw].map(s=>'<button class="serie-btn px-4 py-1.5 rounded-md text-xs '+(opSecaoAtiva===s?'active':'')+'" onclick="opFiltrarSecao(\''+escapar(s)+'\')">'+s+'</button>').join('');}
         function opFiltrarSecao(s){opSecaoAtiva=s;opRenderSecoes();opRenderLista();}
-        function opRenderLista(){const lista=opSecaoAtiva==='Todas'?opTodosOpcionais:opTodosOpcionais.filter(o=>o.secao===opSecaoAtiva);if(lista.length===0){document.getElementById('op-lista').innerHTML='<p class="text-xs text-gray-400 py-8 text-center">Nenhum opcional.</p>';return;}const badge=t=>t==='serie'?'<span class="px-2 py-0.5 rounded-full text-xs font-black bg-gray-800 text-white">◼ Série</span>':t==='opcional'?'<span class="px-2 py-0.5 rounded-full text-xs font-black bg-blue-100 text-bmw border border-blue-200">◻ Opcional</span>':'<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-400">N/D</span>';document.getElementById('op-lista').innerHTML=lista.map(o=>`<div class="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 cursor-pointer hover:border-bmw hover:shadow-sm transition-all" onclick="opAbrirModal('${o.id}')"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-0.5 flex-wrap"><span class="text-xs font-black text-bmw font-mono">${o.codigo}</span>${badge(o.tipo)}${o.preco_iva>0?`<span class="text-xs font-bold text-gray-600">${Number(o.preco_iva).toLocaleString('pt-PT',{minimumFractionDigits:2})} €</span>`:(o.preco_iva===0?'<span class="text-xs font-bold text-green-600">Grátis</span>':'')}</div><p class="text-sm font-bold text-gray-800 truncate">${o.nome}</p>${o.secao?`<p class="text-xs text-gray-400 mt-0.5">${o.secao}</p>`:''}</div><svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>`).join('');}
-        async function opAbrirModal(id){const op=opTodosOpcionais.find(o=>o.id===id);if(!op)return;const{data:d}=await sb.from('op_disponibilidade').select('tipo,op_motorizacoes(nome)').eq('opcional_id',id);document.getElementById('op-modal-codigo').innerText=op.codigo;document.getElementById('op-modal-nome').innerText=op.nome;const pw=document.getElementById('op-modal-preco-wrap');if(op.preco_iva!=null){pw.classList.remove('hidden');document.getElementById('op-modal-preco-iva').innerText=op.preco_iva===0?'Grátis':Number(op.preco_iva).toLocaleString('pt-PT',{minimumFractionDigits:2})+' €';document.getElementById('op-modal-preco-siva').innerText=op.preco_siva?Number(op.preco_siva).toLocaleString('pt-PT',{minimumFractionDigits:2})+' €':'';}else pw.classList.add('hidden');document.getElementById('op-modal-disponib').innerHTML=(d||[]).map(r=>{const cls=r.tipo==='serie'?'bg-gray-800 text-white':r.tipo==='opcional'?'bg-blue-100 text-bmw border border-blue-200':'bg-gray-100 text-gray-400';const sym=r.tipo==='serie'?'◼':r.tipo==='opcional'?'◻':'—';return`<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg ${cls}"><span class="text-xs font-black">${sym}</span><span class="text-xs font-bold">${r.op_motorizacoes?.nome||''}</span></div>`;}).join('');const dw=document.getElementById('op-modal-desc-wrap');op.descricao?(dw.classList.remove('hidden'),document.getElementById('op-modal-desc').innerText=op.descricao):dw.classList.add('hidden');const rw=document.getElementById('op-modal-regras-wrap');op.regras?(rw.classList.remove('hidden'),document.getElementById('op-modal-regras').innerText=op.regras):rw.classList.add('hidden');document.getElementById('op-modal').classList.remove('hidden');document.getElementById('op-modal').classList.add('flex');}
+        function opRenderLista(){const lista=opSecaoAtiva==='Todas'?opTodosOpcionais:opTodosOpcionais.filter(o=>o.secao===opSecaoAtiva);if(lista.length===0){document.getElementById('op-lista').innerHTML='<p class="text-xs text-gray-400 py-8 text-center">Nenhum opcional.</p>';return;}const badge=t=>t==='serie'?'<span class="px-2 py-0.5 rounded-full text-xs font-black bg-gray-800 text-white">\u25fc S\u00e9rie</span>':t==='opcional'?'<span class="px-2 py-0.5 rounded-full text-xs font-black bg-blue-100 text-bmw border border-blue-200">\u25fb Opcional</span>':'<span class="px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-400">N/D</span>';document.getElementById('op-lista').innerHTML=lista.map(o=>'<div class="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center justify-between gap-3 cursor-pointer hover:border-bmw hover:shadow-sm transition-all" onclick="opAbrirModal(\''+o.id+'\')"><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-0.5 flex-wrap"><span class="text-xs font-black text-bmw font-mono">'+o.codigo+'</span>'+badge(o.tipo)+(o.preco_iva>0?'<span class="text-xs font-bold text-gray-600">'+Number(o.preco_iva).toLocaleString('pt-PT',{minimumFractionDigits:2})+' \u20ac</span>':(o.preco_iva===0?'<span class="text-xs font-bold text-green-600">Gr\u00e1tis</span>':''))+'</div><p class="text-sm font-bold text-gray-800 truncate">'+o.nome+'</p>'+(o.secao?'<p class="text-xs text-gray-400 mt-0.5">'+o.secao+'</p>':'')+'</div><svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>').join('');}
+        async function opAbrirModal(id){const op=opTodosOpcionais.find(o=>o.id===id);if(!op)return;const{data:d}=await sb.from('op_disponibilidade').select('tipo,op_motorizacoes(nome)').eq('opcional_id',id);document.getElementById('op-modal-codigo').innerText=op.codigo;document.getElementById('op-modal-nome').innerText=op.nome;const pw=document.getElementById('op-modal-preco-wrap');if(op.preco_iva!=null){pw.classList.remove('hidden');document.getElementById('op-modal-preco-iva').innerText=op.preco_iva===0?'Gr\u00e1tis':Number(op.preco_iva).toLocaleString('pt-PT',{minimumFractionDigits:2})+' \u20ac';document.getElementById('op-modal-preco-siva').innerText=op.preco_siva?Number(op.preco_siva).toLocaleString('pt-PT',{minimumFractionDigits:2})+' \u20ac':'';}else pw.classList.add('hidden');document.getElementById('op-modal-disponib').innerHTML=(d||[]).map(r=>{const cls=r.tipo==='serie'?'bg-gray-800 text-white':r.tipo==='opcional'?'bg-blue-100 text-bmw border border-blue-200':'bg-gray-100 text-gray-400';const sym=r.tipo==='serie'?'\u25fc':r.tipo==='opcional'?'\u25fb':'\u2014';return'<div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg '+cls+'"><span class="text-xs font-black">'+sym+'</span><span class="text-xs font-bold">'+(r.op_motorizacoes?.nome||'')+'</span></div>';}).join('');const dw=document.getElementById('op-modal-desc-wrap');op.descricao?(dw.classList.remove('hidden'),document.getElementById('op-modal-desc').innerText=op.descricao):dw.classList.add('hidden');const rw=document.getElementById('op-modal-regras-wrap');op.regras?(rw.classList.remove('hidden'),document.getElementById('op-modal-regras').innerText=op.regras):rw.classList.add('hidden');document.getElementById('op-modal').classList.remove('hidden');document.getElementById('op-modal').classList.add('flex');}
         function opFecharModal(){document.getElementById('op-modal').classList.add('hidden');document.getElementById('op-modal').classList.remove('flex');}
         function opLimpar(){opMotAtiva=null;opRenderMots();document.getElementById('op-passo-lista').classList.add('hidden');}
-        function opPesquisar(){const q=document.getElementById('op-pesquisa').value.toLowerCase().trim();if(!q){document.getElementById('op-filtro-modelos-wrap').classList.add('hidden');opSerieAtiva=null;opRenderSeries();return;}const f=opTodosModelos.filter(m=>m.nome.toLowerCase().includes(q)||m.codigo.toLowerCase().includes(q));opSerieAtiva=null;opRenderSeries();document.getElementById('op-filtro-modelos').innerHTML=f.length===0?'<p class="text-xs text-gray-400">Nenhum resultado.</p>':f.map(m=>`<button class="modelo-btn px-4 py-2 rounded-md text-xs" id="op-mb-${m.id}" onclick="opClicarModelo('${m.id}','${escapar(m.nome)}')">${m.nome}</button>`).join('');document.getElementById('op-filtro-modelos-wrap').classList.remove('hidden');}
+        function opPesquisar(){const q=document.getElementById('op-pesquisa').value.toLowerCase().trim();if(!q){document.getElementById('op-filtro-modelos-wrap').classList.add('hidden');opSerieAtiva=null;opRenderSeries();return;}const f=opTodosModelos.filter(m=>m.nome.toLowerCase().includes(q)||m.codigo.toLowerCase().includes(q));opSerieAtiva=null;opRenderSeries();document.getElementById('op-filtro-modelos').innerHTML=f.length===0?'<p class="text-xs text-gray-400">Nenhum resultado.</p>':f.map(m=>'<button class="modelo-btn px-4 py-2 rounded-md text-xs" id="op-mb-'+m.id+'" onclick="opClicarModelo(\''+m.id+'\',\''+escapar(m.nome)+'\')">'+m.nome+'</button>').join('');document.getElementById('op-filtro-modelos-wrap').classList.remove('hidden');}
 
-        // ══════════════════════════════════════════════════════════
-        // COMPARADOR BEV
-        // ══════════════════════════════════════════════════════════
+        // ── COMPARADOR BEV ────────────────────────────────────────────────────
         let bevSlots=[null,null,null,null];
-        const BEV_CHAVES=[
-            {label:'Potência (cv)',keys:['Potência combinada comunicada, cv','Potência do sistema motor (acumulado), cv']},
-            {label:'0-100 km/h (seg)',keys:['0-100 km/h, seg.','0-100Km/h, seg.']},
-            {label:'Velocidade Máxima (km/h)',keys:['Velocidade máxima, km/h','Velocidade máxima em modo puramente elétrico, km/h']},
-            {label:'Tração',keys:['Tração','Tracção']},
-            {label:'Autonomia WLTP (km)',keys:['Alcance/Autonomia (WLTP), km','Alcance (WLTP), km']},
-            {label:'Consumo (kWh/100km)',keys:['Consumo combinado de energia (WLTP), kWh/100 km','Consumo de energia combinado (WLTP), kWh/100 km']},
-            {label:'Bateria líquida (kWh)',keys:['Capacidade líquida da bateria de alta tensão, kWh']},
-            {label:'Bateria bruta (kWh)',keys:['Bateria de Alta Tensão - Capacidade energética (bruta), kWh']},
-            {label:'Carga DC máx (kW)',keys:['Potência máxima de carregamento DC, kW','Capacidade maxima de carga DC, kW']},
-            {label:'Carga AC série (kW)',keys:['Capacidade maxima de carga AC standard, kW']},
-            {label:'Carga AC opcional (kW)',keys:['Capacidade maxima de carga AC alta, kW']},
-            {label:'0-100% AC 1',keys:['Tempo de carregamento AC 1 (0-100%), h']},
-            {label:'0-100% AC 2',keys:['Tempo de carregamento AC 2 (0-100%), h']},
-            {label:'0-100% AC 3',keys:['Tempo de carregamento AC 3 (0-100%), h']},
-            {label:'0-100% AC 4',keys:['Tempo de carregamento AC 4 (0-100%), h']},
-            {label:'10-80% DC 1',keys:['Tempo de carregamento DC 1 (10-80%), h']},
-            {label:'10-80% DC 2',keys:['Tempo de carregamento DC 2 (10-80%), h']},
-            {label:'10-80% DC 3',keys:['Tempo de carregamento DC 3 (10-80%), h']},
-            {label:'10-80% DC 4',keys:['Tempo de carregamento DC 4 (10-80%), h']},
-        ];
-        function bevGetVal(specs,ch){for(const k of (ch.keys||[])){if(specs[k]!=null&&specs[k]!=='')return specs[k];}return '—';}
-        function bevRenderSlots(){
-            document.getElementById('bev-slots').innerHTML=bevSlots.map((s,i)=>{
-                if(!s)return`<div class="bg-white border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center min-h-36 gap-2 cursor-pointer hover:border-green-400 transition-colors" onclick="bevAbrirModal(${i})"><div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 text-2xl">+</div><p class="text-xs font-bold text-gray-400 uppercase text-center">Adicionar BEV</p></div>`;
-                if(!s.motId)return`<div class="bg-white border-2 border-green-300 rounded-xl p-4 flex flex-col min-h-36 gap-2"><div class="flex justify-between"><p class="text-xs font-black text-gray-800 flex-1">${s.modeloNome}</p><button onclick="bevLimparSlot(${i})" class="text-gray-300 hover:text-red-400 ml-1">✕</button></div><p class="text-xs font-bold text-gray-400 uppercase mt-1">Escolha:</p><div class="flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1 mt-1" id="bev-slot-mots-${i}"><p class="text-xs text-gray-400">A carregar...</p></div></div>`;
-                return`<div class="bg-white border-2 border-green-500 rounded-xl p-4 flex flex-col min-h-36 gap-2"><div class="flex justify-between"><div class="flex-1"><p class="text-xs font-black text-gray-800">${s.modeloNome}</p><p class="text-xs font-bold text-green-600 mt-1">${s.motNome}</p></div><button onclick="bevLimparSlot(${i})" class="text-gray-300 hover:text-red-400 ml-1">✕</button></div><div class="mt-auto flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span><span class="text-xs font-bold text-green-600 uppercase">Pronto</span></div></div>`;
-            }).join('');
-            bevSlots.forEach((s,i)=>{if(s&&!s.motId)bevCarregarMotsSlot(i,s.modeloId);});
-            bevRenderTabela();
-        }
-        async function bevCarregarMotsSlot(i,modeloId){const{data}=await sb.from('motorizacoes').select('id,codigo,nome_visual').eq('modelo_id',modeloId).order('codigo');const cont=document.getElementById('bev-slot-mots-'+i);if(!cont)return;cont.innerHTML=(data||[]).map(m=>`<button class="text-left px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-700 hover:border-green-400 hover:text-green-600 transition-colors" onclick="bevEscolherMot(${i},'${m.id}','${escapar(m.nome_visual||m.codigo)}')">${m.nome_visual||m.codigo}</button>`).join('');}
+        const BEV_CHAVES=[{label:'Pot\u00eancia (cv)',keys:['Pot\u00eancia combinada comunicada, cv','Pot\u00eancia do sistema motor (acumulado), cv']},{label:'0-100 km/h (seg)',keys:['0-100 km/h, seg.','0-100Km/h, seg.']},{label:'Velocidade M\u00e1xima (km/h)',keys:['Velocidade m\u00e1xima, km/h','Velocidade m\u00e1xima em modo puramente el\u00e9trico, km/h']},{label:'Tra\u00e7\u00e3o',keys:['Tra\u00e7\u00e3o','Tracc\u00e3o']},{label:'Autonomia WLTP (km)',keys:['Alcance/Autonomia (WLTP), km','Alcance (WLTP), km']},{label:'Consumo (kWh/100km)',keys:['Consumo combinado de energia (WLTP), kWh/100 km']},{label:'Bateria l\u00edquida (kWh)',keys:['Capacidade l\u00edquida da bateria de alta tens\u00e3o, kWh']},{label:'Bateria bruta (kWh)',keys:['Bateria de Alta Tens\u00e3o - Capacidade energ\u00e9tica (bruta), kWh']},{label:'Carga DC m\u00e1x (kW)',keys:['Pot\u00eancia m\u00e1xima de carregamento DC, kW','Capacidade maxima de carga DC, kW']},{label:'Carga AC s\u00e9rie (kW)',keys:['Capacidade maxima de carga AC standard, kW']},{label:'0-100% AC 1',keys:['Tempo de carregamento AC 1 (0-100%), h']},{label:'0-100% AC 2',keys:['Tempo de carregamento AC 2 (0-100%), h']},{label:'0-100% AC 3',keys:['Tempo de carregamento AC 3 (0-100%), h']},{label:'10-80% DC 1',keys:['Tempo de carregamento DC 1 (10-80%), h']},{label:'10-80% DC 2',keys:['Tempo de carregamento DC 2 (10-80%), h']},{label:'10-80% DC 3',keys:['Tempo de carregamento DC 3 (10-80%), h']},{label:'10-80% DC 4',keys:['Tempo de carregamento DC 4 (10-80%), h']}];
+        function bevGetVal(s,ch){for(const k of(ch.keys||[])){if(s[k]!=null&&s[k]!=='')return s[k];}return '\u2014';}
+        function bevRenderSlots(){document.getElementById('bev-slots').innerHTML=bevSlots.map((s,i)=>{if(!s)return'<div class="bg-white border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center min-h-36 gap-2 cursor-pointer hover:border-green-400 transition-colors" onclick="bevAbrirModal('+i+')"><div class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 text-2xl">+</div><p class="text-xs font-bold text-gray-400 uppercase text-center">Adicionar BEV</p></div>';if(!s.motId)return'<div class="bg-white border-2 border-green-300 rounded-xl p-4 flex flex-col min-h-36 gap-2"><div class="flex justify-between"><p class="text-xs font-black text-gray-800 flex-1">'+s.modeloNome+'</p><button onclick="bevLimparSlot('+i+')" class="text-gray-300 hover:text-red-400 ml-1">\u2715</button></div><p class="text-xs font-bold text-gray-400 uppercase mt-1">Escolha:</p><div class="flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1 mt-1" id="bev-slot-mots-'+i+'"><p class="text-xs text-gray-400">A carregar...</p></div></div>';return'<div class="bg-white border-2 border-green-500 rounded-xl p-4 flex flex-col min-h-36 gap-2"><div class="flex justify-between"><div class="flex-1"><p class="text-xs font-black text-gray-800">'+s.modeloNome+'</p><p class="text-xs font-bold text-green-600 mt-1">'+s.motNome+'</p></div><button onclick="bevLimparSlot('+i+')" class="text-gray-300 hover:text-red-400 ml-1">\u2715</button></div><div class="mt-auto flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span><span class="text-xs font-bold text-green-600 uppercase">Pronto</span></div></div>';}).join('');bevSlots.forEach((s,i)=>{if(s&&!s.motId)bevCarregarMotsSlot(i,s.modeloId);});bevRenderTabela();}
+        async function bevCarregarMotsSlot(i,mid){const{data}=await sb.from('motorizacoes').select('id,codigo,nome_visual').eq('modelo_id',mid).order('codigo');const cont=document.getElementById('bev-slot-mots-'+i);if(!cont)return;cont.innerHTML=(data||[]).map(m=>'<button class="text-left px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-bold text-gray-700 hover:border-green-400 hover:text-green-600 transition-colors" onclick="bevEscolherMot('+i+',\''+m.id+'\',\''+escapar(m.nome_visual||m.codigo)+'\')">'+( m.nome_visual||m.codigo)+'</button>').join('');}
         async function bevEscolherMot(i,motId,motNome){bevSlots[i].motId=motId;bevSlots[i].motNome=motNome;const{data}=await sb.from('especificacoes').select('chave,valor').eq('motorizacao_id',motId);bevSlots[i].specs={};(data||[]).forEach(r=>{bevSlots[i].specs[r.chave]=r.valor;});bevRenderSlots();}
-        function bevAbrirModal(i){
-            document.getElementById('bev-modal-slot').value=i;
-            document.getElementById('bev-modal-titulo').innerText='Escolher Modelo BEV';
-            sb.from('modelos').select('id,codigo,nome').order('nome').then(({data})=>{
-                const todos=data||[];
-                const lista=todos.filter(m=>/i4|ix|iX|bev/i.test(m.nome)||['G26BEV','NA5','I20','G60','G61','G70'].some(c=>m.codigo.toUpperCase()===c));
-                document.getElementById('bev-modal-lista').innerHTML=(lista.length>0?lista:todos).map(m=>`<button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 hover:border-green-400 hover:bg-green-50 transition-colors mb-1" onclick="bevEscolherModelo('${m.id}','${escapar(m.nome)}')"><p class="text-sm font-black text-gray-800">${m.nome}</p><p class="text-xs text-gray-400 font-mono">${m.codigo}</p></button>`).join('');
-            });
-            document.getElementById('bev-modal').classList.remove('hidden');document.getElementById('bev-modal').classList.add('flex');
-        }
-        async function bevEscolherModelo(modeloId,modeloNome){
-            const i=parseInt(document.getElementById('bev-modal-slot').value);
-            bevSlots[i]={modeloId,modeloNome,motId:null,motNome:null,specs:{}};
-            document.getElementById('bev-modal-titulo').innerText='Escolher Motorização';
-            const{data}=await sb.from('motorizacoes').select('id,codigo,nome_visual').eq('modelo_id',modeloId).order('codigo');
-            document.getElementById('bev-modal-lista').innerHTML=(data||[]).map(m=>`<button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 hover:border-green-400 hover:bg-green-50 transition-colors mb-1" onclick="bevEscolherMotModal('${m.id}','${escapar(m.nome_visual||m.codigo)}')"><p class="text-sm font-black text-gray-800">${m.nome_visual||m.codigo}</p><p class="text-xs text-gray-400 font-mono">${m.codigo}</p></button>`).join('');
-        }
+        function bevAbrirModal(i){document.getElementById('bev-modal-slot').value=i;document.getElementById('bev-modal-titulo').innerText='Escolher Modelo BEV';sb.from('modelos').select('id,codigo,nome').order('nome').then(({data})=>{const todos=data||[];const lista=todos.filter(m=>/\bi4\b|\bix\b|bev/i.test(m.nome)||['G26BEV','NA5','I20','G60','G61','G70'].some(c=>m.codigo.toUpperCase()===c));document.getElementById('bev-modal-lista').innerHTML=(lista.length>0?lista:todos).map(m=>'<button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 hover:border-green-400 hover:bg-green-50 transition-colors mb-1" onclick="bevEscolherModelo(\''+m.id+'\',\''+escapar(m.nome)+'\')"><p class="text-sm font-black text-gray-800">'+m.nome+'</p><p class="text-xs text-gray-400 font-mono">'+m.codigo+'</p></button>').join('');});document.getElementById('bev-modal').classList.remove('hidden');document.getElementById('bev-modal').classList.add('flex');}
+        async function bevEscolherModelo(modeloId,modeloNome){const i=parseInt(document.getElementById('bev-modal-slot').value);bevSlots[i]={modeloId,modeloNome,motId:null,motNome:null,specs:{}};document.getElementById('bev-modal-titulo').innerText='Escolher Motoriza\u00e7\u00e3o';const{data}=await sb.from('motorizacoes').select('id,codigo,nome_visual').eq('modelo_id',modeloId).order('codigo');document.getElementById('bev-modal-lista').innerHTML=(data||[]).map(m=>'<button class="w-full text-left px-4 py-3 rounded-xl border border-gray-100 hover:border-green-400 hover:bg-green-50 transition-colors mb-1" onclick="bevEscolherMotModal(\''+m.id+'\',\''+escapar(m.nome_visual||m.codigo)+'\')"><p class="text-sm font-black text-gray-800">'+(m.nome_visual||m.codigo)+'</p></button>').join('');}
         async function bevEscolherMotModal(motId,motNome){const i=parseInt(document.getElementById('bev-modal-slot').value);bevSlots[i].motId=motId;bevSlots[i].motNome=motNome;const{data}=await sb.from('especificacoes').select('chave,valor').eq('motorizacao_id',motId);bevSlots[i].specs={};(data||[]).forEach(r=>{bevSlots[i].specs[r.chave]=r.valor;});bevFecharModal();bevRenderSlots();}
         function bevFecharModal(){document.getElementById('bev-modal').classList.add('hidden');document.getElementById('bev-modal').classList.remove('flex');}
         function bevLimparSlot(i){bevSlots[i]=null;bevRenderSlots();}
         function bevLimpar(){bevSlots=[null,null,null,null];bevRenderSlots();}
-        function bevRenderTabela(){
-            const wrap=document.getElementById('bev-tabela-wrap');
-            const c=bevSlots.filter(s=>s&&s.motId);
-            if(c.length<2){wrap.classList.add('hidden');return;}
-            wrap.classList.remove('hidden');
-            const cw=Math.floor(58/c.length);
-            document.getElementById('bev-thead').innerHTML=`<tr class="border-b-2 border-gray-100"><th class="px-4 py-3 text-left text-xs font-black text-gray-400 uppercase bg-gray-50" style="width:42%">Especificação</th>${c.map(s=>`<th class="px-3 py-3 text-left bg-gray-50 border-l border-gray-100" style="width:${cw}%"><p class="text-xs font-black text-green-700 leading-tight">${s.modeloNome}</p><p class="text-xs font-bold text-gray-500 mt-0.5">${s.motNome}</p></th>`).join('')}</tr>`;
-            document.getElementById('bev-tbody').innerHTML=BEV_CHAVES.map(ch=>{const vals=c.map(s=>bevGetVal(s.specs,ch));const ig=vals.every(v=>v===vals[0]&&v!=='—');const todosVazios=vals.every(v=>v==='—');if(todosVazios)return'';return`<tr class="border-b border-gray-100 hover:bg-green-50/30 transition-colors"><td class="px-4 py-2.5 text-xs text-gray-600">${ch.label}</td>${vals.map(v=>`<td class="px-3 py-2.5 text-xs font-bold border-l border-gray-100 ${v==='—'?'text-gray-300':ig?'text-gray-800':'text-green-700'}">${v}</td>`).join('')}</tr>`;}).join('');
-        }
+        function bevRenderTabela(){const wrap=document.getElementById('bev-tabela-wrap');const c=bevSlots.filter(s=>s&&s.motId);if(c.length<2){wrap.classList.add('hidden');return;}wrap.classList.remove('hidden');const cw=Math.floor(58/c.length);document.getElementById('bev-thead').innerHTML='<tr class="border-b-2 border-gray-100"><th class="px-4 py-3 text-left text-xs font-black text-gray-400 uppercase bg-gray-50" style="width:42%">Especifica\u00e7\u00e3o</th>'+c.map(s=>'<th class="px-3 py-3 text-left bg-gray-50 border-l border-gray-100" style="width:'+cw+'%"><p class="text-xs font-black text-green-700 leading-tight">'+s.modeloNome+'</p><p class="text-xs font-bold text-gray-500 mt-0.5">'+s.motNome+'</p></th>').join('')+'</tr>';document.getElementById('bev-tbody').innerHTML=BEV_CHAVES.map(ch=>{const vals=c.map(s=>bevGetVal(s.specs,ch));const ig=vals.every(v=>v===vals[0]&&v!=='\u2014');const vz=vals.every(v=>v==='\u2014');if(vz)return'';return'<tr class="border-b border-gray-100 hover:bg-green-50/30 transition-colors"><td class="px-4 py-2.5 text-xs text-gray-600">'+ch.label+'</td>'+vals.map(v=>'<td class="px-3 py-2.5 text-xs font-bold border-l border-gray-100 '+(v==='\u2014'?'text-gray-300':ig?'text-gray-800':'text-green-700')+'">'+v+'</td>').join('')+'</tr>';}).join('');}
 
-        // ══════════════════════════════════════════════════════════
-        // CALCULADORA
-        // ══════════════════════════════════════════════════════════
-        function calcFmt(n,d=2){return n.toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d});}
-        function calcTempo(h){if(isNaN(h)||h<=0)return'—';const hh=Math.floor(h),mm=Math.round((h-hh)*60);if(hh===0)return`${mm} min`;if(mm===0)return`${hh}h`;return`${hh}h ${mm}min`;}
+        // ── CALCULADORA ───────────────────────────────────────────────────────
+        function calcFmt(n,d){d=d===undefined?2:d;return n.toLocaleString('pt-PT',{minimumFractionDigits:d,maximumFractionDigits:d});}
+        function calcTempo(h){if(isNaN(h)||h<=0)return'\u2014';const hh=Math.floor(h),mm=Math.round((h-hh)*60);if(hh===0)return mm+' min';if(mm===0)return hh+'h';return hh+'h '+mm+'min';}
         function calcAtualizar(){
             const bat=parseFloat(document.getElementById('calc-bateria').value);
             const pot=parseFloat(document.getElementById('calc-potencia').value);
@@ -957,25 +749,150 @@ ${respostas[0].chave}: <strong>${respostas[0].valor}</strong>`, html: true};
             document.getElementById('calc-potencia-val').innerText=calcFmt(pot,1);
             document.getElementById('calc-soc-ini-val').innerText=si+'%';
             document.getElementById('calc-soc-fin-val').innerText=sf+'%';
-            document.getElementById('calc-preco-kwh-val').innerText=calcFmt(pkwh)+' €';
+            document.getElementById('calc-preco-kwh-val').innerText=calcFmt(pkwh)+' \u20ac';
             document.getElementById('calc-km-val').innerText=calcFmt(km,0);
             document.getElementById('calc-consumo-val').innerText=calcFmt(cons,1);
-            if(sf<=si){document.getElementById('calc-res-tempo').innerText='Inválido';document.getElementById('calc-res-energia').innerText='—';return;}
-            const energia=bat*(sf-si)/100;
-            const horas=energia/pot;
-            document.getElementById('calc-res-tempo').innerText=calcTempo(horas);
-            document.getElementById('calc-res-energia').innerText=calcFmt(energia,1)+' kWh';
-            const custo=energia*pkwh;
+            if(sf<=si){document.getElementById('calc-res-tempo').innerText='Inv\u00e1lido';return;}
+            const en=bat*(sf-si)/100;
+            document.getElementById('calc-res-tempo').innerText=calcTempo(en/pot);
+            document.getElementById('calc-res-energia').innerText=calcFmt(en,1)+' kWh';
+            const custo=en*pkwh;
             const auto=(bat/cons)*100;
-            const c100=auto>0?(custo/auto)*100:0;
-            document.getElementById('calc-res-custo').innerText=calcFmt(custo)+' €';
-            document.getElementById('calc-res-custo-100').innerText=calcFmt(c100)+' €';
+            document.getElementById('calc-res-custo').innerText=calcFmt(custo)+' \u20ac';
+            document.getElementById('calc-res-custo-100').innerText=calcFmt(auto>0?(custo/auto)*100:0)+' \u20ac';
             const ev=(cons/100)*km;
             document.getElementById('calc-res-viagem-energia').innerText=calcFmt(ev,1)+' kWh';
-            document.getElementById('calc-res-viagem-custo').innerText=calcFmt(ev*pkwh)+' €';
+            document.getElementById('calc-res-viagem-custo').innerText=calcFmt(ev*pkwh)+' \u20ac';
         }
-        setTimeout(calcAtualizar,200);
+        setTimeout(calcAtualizar, 300);
 
     </script>
+    <!-- OPCIONAIS TAB -->
+    <div id="tab-opcionais-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-4 flex items-center gap-3">
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+            <input type="text" id="op-pesquisa" placeholder="Pesquisar modelo..." oninput="opPesquisar()" class="flex-1 text-sm outline-none bg-transparent">
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-3"><div class="flex flex-wrap gap-2" id="op-filtro-series"></div></div>
+        <div id="op-filtro-modelos-wrap" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-4">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Outras categorias</p>
+            <div class="flex flex-wrap gap-2" id="op-filtro-modelos"></div>
+        </div>
+        <div id="op-passo-mot" class="hidden bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-4 mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center">2</span>
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Motorização</span>
+                    <span id="op-modelo-label" class="text-xs font-bold text-bmw bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full"></span>
+                </div>
+                <button onclick="opLimpar()" class="text-xs text-gray-400 hover:text-red-500 font-bold">Limpar</button>
+            </div>
+            <div id="op-grid-mots" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div id="op-passo-lista" class="hidden">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="w-6 h-6 rounded-full bg-bmw text-white text-xs font-black flex items-center justify-center">3</span>
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Opcionais</span>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm px-4 py-3 mb-4 overflow-x-auto no-scrollbar"><div class="flex gap-2 flex-wrap" id="op-filtro-secoes"></div></div>
+            <div id="op-lista" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- MODAL opcional -->
+    <div id="op-modal" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden" style="max-height:85vh">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <div><p id="op-modal-codigo" class="text-xs font-bold text-bmw font-mono"></p><h2 id="op-modal-nome" class="text-base font-black text-gray-800 mt-0.5"></h2></div>
+                <button onclick="opFecharModal()" class="text-gray-400 hover:text-red-500 text-xl font-bold ml-4">✕</button>
+            </div>
+            <div class="overflow-y-auto p-5 space-y-4 no-scrollbar">
+                <div id="op-modal-preco-wrap" class="hidden bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Preço c/ IVA</p><p id="op-modal-preco-iva" class="text-xl font-black text-bmw mt-0.5"></p></div>
+                    <div class="text-right"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Preço s/ IVA</p><p id="op-modal-preco-siva" class="text-sm font-bold text-gray-600 mt-0.5"></p></div>
+                </div>
+                <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Disponibilidade</p><div id="op-modal-disponib" class="flex flex-wrap gap-2"></div></div>
+                <div id="op-modal-desc-wrap" class="hidden"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Descrição</p><p id="op-modal-desc" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line"></p></div>
+                <div id="op-modal-regras-wrap" class="hidden"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Regras</p><p id="op-modal-regras" class="text-sm text-gray-500 leading-relaxed whitespace-pre-line"></p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BEV TAB -->
+    <div id="tab-bev-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3 mb-5 flex items-center gap-2">
+            <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <p class="text-xs font-bold text-green-700">Selecione até 4 motorizações BEV para comparar lado a lado.</p>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6" id="bev-slots"></div>
+        <div id="bev-tabela-wrap" class="hidden">
+            <div class="flex items-center justify-between mb-3">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Comparação BEV — verde = valores diferentes</p>
+                <button onclick="bevLimpar()" class="text-xs text-gray-400 hover:text-red-500 font-bold uppercase tracking-widest">Limpar tudo</button>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto no-scrollbar">
+                    <table class="w-full text-sm" style="min-width:400px"><thead id="bev-thead"></thead><tbody id="bev-tbody"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BEV -->
+    <div id="bev-modal" class="fixed inset-0 bg-slate-900/70 z-50 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col overflow-hidden" style="max-height:85vh">
+            <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h2 id="bev-modal-titulo" class="text-sm font-black text-gray-800 uppercase tracking-widest">Escolher Modelo BEV</h2>
+                <button onclick="bevFecharModal()" class="text-gray-400 hover:text-red-500 text-lg font-bold">✕</button>
+            </div>
+            <input type="hidden" id="bev-modal-slot" value="0">
+            <div class="overflow-y-auto p-3 flex-1 no-scrollbar" id="bev-modal-lista"></div>
+        </div>
+    </div>
+
+    <!-- CALC TAB -->
+    <div id="tab-calc-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-bmw to-blue-500 px-5 py-3"><p class="text-xs font-black text-white uppercase tracking-widest">Tempo de carregamento</p></div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Bateria (kWh)</p><div class="flex items-center gap-2"><input type="range" id="calc-bateria" min="10" max="120" value="75" step="1" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-bateria-val" class="text-base font-black text-bmw w-12 text-right">75</span></div></div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Potência (kW)</p><div class="flex items-center gap-2"><input type="range" id="calc-potencia" min="1" max="350" value="11" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-potencia-val" class="text-base font-black text-bmw w-14 text-right">11</span></div></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">SOC inicial (%)</p><div class="flex items-center gap-2"><input type="range" id="calc-soc-ini" min="0" max="95" value="10" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-soc-ini-val" class="text-base font-black text-bmw w-10 text-right">10%</span></div></div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">SOC final (%)</p><div class="flex items-center gap-2"><input type="range" id="calc-soc-fin" min="5" max="100" value="100" step="5" oninput="calcAtualizar()" class="flex-1 accent-bmw"><span id="calc-soc-fin-val" class="text-base font-black text-bmw w-10 text-right">100%</span></div></div>
+                </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl px-5 py-4 flex items-center justify-between">
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Tempo estimado</p><p id="calc-res-tempo" class="text-3xl font-black text-bmw mt-1">—</p></div>
+                    <div class="text-right"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia</p><p id="calc-res-energia" class="text-xl font-black text-gray-700 mt-1">—</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-green-500 to-green-400 px-5 py-3"><p class="text-xs font-black text-white uppercase tracking-widest">Custo de carregamento</p></div>
+            <div class="p-5 space-y-4">
+                <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Preço por kWh (€)</p><div class="flex items-center gap-2"><input type="range" id="calc-preco-kwh" min="0.05" max="0.60" value="0.15" step="0.01" oninput="calcAtualizar()" class="flex-1 accent-green-500"><span id="calc-preco-kwh-val" class="text-base font-black text-green-600 w-14 text-right">0,15 €</span></div><div class="flex justify-between text-xs text-gray-300 mt-1 px-1"><span>0,05€</span><span>Casa ~0,15€</span><span>Público ~0,40€</span><span>0,60€</span></div></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo total</p><p id="calc-res-custo" class="text-2xl font-black text-green-600 mt-1">—</p></div>
+                    <div class="bg-green-50 border border-green-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo / 100 km</p><p id="calc-res-custo-100" class="text-2xl font-black text-green-600 mt-1">—</p></div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-4">
+            <div class="bg-gradient-to-r from-purple-500 to-purple-400 px-5 py-3"><p class="text-xs font-black text-white uppercase tracking-widest">Custo por viagem</p></div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Distância (km)</p><div class="flex items-center gap-2"><input type="range" id="calc-km" min="10" max="800" value="100" step="10" oninput="calcAtualizar()" class="flex-1 accent-purple-500"><span id="calc-km-val" class="text-base font-black text-purple-600 w-14 text-right">100</span></div></div>
+                    <div><p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Consumo (kWh/100km)</p><div class="flex items-center gap-2"><input type="range" id="calc-consumo" min="10" max="40" value="20" step="0.5" oninput="calcAtualizar()" class="flex-1 accent-purple-500"><span id="calc-consumo-val" class="text-base font-black text-purple-600 w-14 text-right">20,0</span></div></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Energia usada</p><p id="calc-res-viagem-energia" class="text-2xl font-black text-purple-600 mt-1">—</p></div>
+                    <div class="bg-purple-50 border border-purple-100 rounded-xl px-4 py-3"><p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Custo da viagem</p><p id="calc-res-viagem-custo" class="text-2xl font-black text-purple-600 mt-1">—</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
