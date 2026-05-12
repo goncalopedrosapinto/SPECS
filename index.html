@@ -248,13 +248,9 @@
         if (error) { mostrarErro(error.message); return; }
         todosModelos = data || [];
         document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
         renderizarSeries(todosModelos);
-        // Start on genius tab
-        document.getElementById('tab-genius-content').classList.remove('hidden');
-        document.getElementById('tab-dados-content').classList.add('hidden');
-        document.getElementById('tab-genius').classList.add('border-bmw','text-bmw');
-        document.getElementById('tab-genius').classList.remove('border-transparent','text-gray-400');
-        geniusCarregarDados();
+        mudarTab('genius');
     };
 
     // ── RENDER: SÉRIES ────────────────────────────────────────────────────────
@@ -541,6 +537,10 @@
             });
             const el = document.getElementById(TAB_DIVS[tab]);
             if (el) el.classList.remove('hidden');
+            if (tab === 'dados') {
+                const mc = document.getElementById('main-content');
+                if (mc) mc.classList.remove('hidden');
+            }
             const ab = document.getElementById('tab-' + tab);
             if (ab) { ab.classList.add('border-bmw','text-bmw'); ab.classList.remove('border-transparent','text-gray-400'); }
             if (tab === 'genius') geniusCarregarDados();
@@ -556,10 +556,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('genius-send-btn').addEventListener('click', geniusEnviar);
             document.getElementById('genius-input').addEventListener('keydown', function(e) { if(e.key==='Enter') geniusEnviar(); });
-            document.getElementById('gs1').addEventListener('click', function() { geniusPergunta('Qual a autonomia do iX?'); });
-            document.getElementById('gs2').addEventListener('click', function() { geniusPergunta('Qual a pot\u00eancia do M5?'); });
-            document.getElementById('gs3').addEventListener('click', function() { geniusPergunta('Qual o consumo do i4?'); });
-            document.getElementById('gs4').addEventListener('click', function() { geniusPergunta('Quais s\u00e3o os modelos el\u00e9tricos?'); });
+            document.getElementById('gs1').addEventListener('click', function() { geniusPergunta('autonomia iX'); });
+            document.getElementById('gs2').addEventListener('click', function() { geniusPergunta('potencia M5'); });
+            document.getElementById('gs3').addEventListener('click', function() { geniusPergunta('consumo i4'); });
+            document.getElementById('gs4').addEventListener('click', function() { geniusPergunta('modelos eletricos'); });
             document.getElementById('op-limpar-btn').addEventListener('click', opLimpar);
             document.getElementById('op-modal-fechar').addEventListener('click', opFecharModal);
             document.getElementById('op-pesquisa').addEventListener('input', opPesquisar);
@@ -772,218 +772,6 @@
             if (tab === 'calc') setTimeout(calcAtualizar, 50);
             if (tab === 'genius') geniusCarregarDados();
         }
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // GENIUS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        let geniusModelos = null, geniusMots = {}, geniusSpecs = null, geniusLoading = false;
-
-        async function geniusCarregarDados() {
-            if (geniusModelos) return;
-            geniusModelos = {};
-            const {data: mods} = await sb.from('modelos').select('id,codigo,nome');
-            (mods||[]).forEach(m => { geniusModelos[m.id] = m; });
-            const {data: mots} = await sb.from('motorizacoes').select('id,codigo,nome_visual,modelo_id');
-            (mots||[]).forEach(m => { geniusMots[m.id] = m; });
-            geniusSpecs = {};
-            let from = 0;
-            while(true) {
-                const {data} = await sb.from('especificacoes').select('chave,valor,motorizacao_id').range(from, from+999);
-                if(!data||data.length===0) break;
-                data.forEach(s => {
-                    if(!geniusSpecs[s.motorizacao_id]) geniusSpecs[s.motorizacao_id] = {};
-                    geniusSpecs[s.motorizacao_id][s.chave] = s.valor;
-                });
-                if(data.length < 1000) break;
-                from += 1000;
-            }
-        }
-
-        function geniusMsg(texto, tipo, isHtml) {
-            const msgs = document.getElementById('genius-msgs');
-            const div = document.createElement('div');
-            div.className = 'flex items-start gap-2' + (tipo==='user' ? ' justify-end' : '');
-            const iconHtml = '<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>';
-            if (tipo === 'bot') {
-                const bubble = document.createElement('div');
-                bubble.className = 'bg-gray-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-xs sm:max-w-md';
-                if (isHtml) { bubble.innerHTML = texto; }
-                else { bubble.innerHTML = '<p class="text-sm text-gray-800 leading-relaxed">' + texto.replace(/\n/g,'<br>') + '</p>'; }
-                div.innerHTML = iconHtml;
-                div.appendChild(bubble);
-            } else {
-                div.innerHTML = '<div class="bg-bmw rounded-2xl rounded-tr-none px-4 py-2.5 max-w-xs sm:max-w-md"><p class="text-sm text-white">' + texto + '</p></div>';
-            }
-            msgs.appendChild(div);
-            msgs.scrollTop = msgs.scrollHeight;
-        }
-
-        function geniusTyping(show) {
-            document.getElementById('genius-typing')?.remove();
-            if (!show) return;
-            const msgs = document.getElementById('genius-msgs');
-            const div = document.createElement('div');
-            div.id = 'genius-typing';
-            div.className = 'flex items-start gap-2';
-            div.innerHTML = '<div class="w-7 h-7 rounded-full bg-bmw flex items-center justify-center flex-shrink-0 mt-0.5"><svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div><div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></div></div>';
-            msgs.appendChild(div);
-            msgs.scrollTop = msgs.scrollHeight;
-        }
-
-        function normG(s) {
-            return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
-        }
-
-        function geniusEncontrarModelo(pergunta) {
-            const p = normG(pergunta) + ' ';
-            let best = null, bestScore = 0;
-            const atalhos = {
-                'serie 1': /serie 1|s1 /,
-                'serie 2': /serie 2|s2 /,
-                'serie 3': /serie 3|s3 /,
-                'serie 4': /serie 4|s4 /,
-                'serie 5': /serie 5|s5 /,
-                'serie 7': /serie 7|s7 /,
-                'x1': / x1 | x1,/,
-                'x2': / x2 | x2,/,
-                'x3': / x3 | x3,/,
-                'x4': / x4 | x4,/,
-                'x5': / x5 | x5,/,
-                'x6': / x6 | x6,/,
-                'x7': / x7 | x7,/,
-                'xm': / xm | xm,/,
-                'i4': / i4 | i4,| i4\./,
-                'i5': / i5 | i5,| i5\./,
-                'i7': / i7 | i7,| i7\./,
-                'ix3': /ix3/,
-                'ix': / ix | ix,/,
-                'm2': / m2 | m2,/,
-                'm3': / m3 | m3,/,
-                'm4': / m4 | m4,/,
-                'm5': / m5 | m5,/,
-                'z4': / z4 | z4,/,
-            };
-
-            Object.values(geniusModelos).forEach(m => {
-                let score = 0;
-                const nomeN = normG(m.nome);
-                const codN = normG(m.codigo);
-
-                Object.entries(atalhos).forEach(([key, rx]) => {
-                    if ((nomeN + ' ').includes(key + ' ') || codN === key.replace(' ','')) {
-                        if (rx.test(' ' + p)) score += 10;
-                    }
-                });
-
-                if ((' ' + p).includes(' ' + codN + ' ')) score += 8;
-                nomeN.split(' ').forEach(w => { if (w.length >= 3 && p.includes(w + ' ')) score += 1; });
-
-                if (score > bestScore) { bestScore = score; best = m; }
-            });
-            return bestScore >= 1 ? best : null;
-        }
-
-        function geniusEncontrarChave(p, specs) {
-            const pn = normG(p);
-            const chaves = Object.keys(specs);
-            const intencoes = [
-                {pw:['autonomia','alcance','range'], m:['autonomia','alcance','wltp']},
-                {pw:['potencia','potencia','cv','cavalos'], m:['potencia','cv','kw','motor']},
-                {pw:['bateria','kwh','capacidade'], m:['bateria','kwh','capacidade']},
-                {pw:['consumo'], m:['consumo','energia','kwh/100']},
-                {pw:['velocidade','maxima'], m:['velocidade','maxima']},
-                {pw:['0-100','aceleracao'], m:['0-100','seg']},
-                {pw:['peso','massa'], m:['peso','massa','kg']},
-                {pw:['comprimento','tamanho'], m:['comprimento','mm']},
-                {pw:['porta-malas','bagageira'], m:['porta-malas','bagageira','litros']},
-                {pw:['tracao','xdrive'], m:['tracao','traccao']},
-                {pw:['carregamento','carregar','carga'], m:['carregamento','carga','dc','ac']},
-                {pw:['transmissao','caixa'], m:['transmissao','caixa']},
-                {pw:['binario','torque'], m:['binario','nm','torque']},
-            ];
-            for (const i of intencoes) {
-                if (i.pw.some(pw => pn.includes(normG(pw)))) {
-                    const found = chaves.filter(k => { const kn = normG(k); return i.m.some(m => kn.includes(m)); });
-                    if (found.length > 0) return found;
-                }
-            }
-            return null;
-        }
-
-        async function geniusResponder(pergunta) {
-            await geniusCarregarDados();
-            const p = normG(pergunta);
-
-            if (p.includes('eletric') || (p.includes('bev') && !p.includes('compara'))) {
-                const bevs = Object.values(geniusModelos).filter(m =>
-                    /i4|i5|i7|ix|bev/i.test(m.nome) || ['G26BEV','NA5','I20','G60','G61','G70'].includes(m.codigo.toUpperCase())
-                );
-                if (bevs.length > 0) return {text: 'Modelos com vers\u00f5es 100% el\u00e9tricas:\n' + bevs.map(m => '- ' + m.nome).join('\n')};
-            }
-
-            const modelo = geniusEncontrarModelo(pergunta);
-            if (!modelo) return {text: 'N\u00e3o identifiquei o modelo. Ex: "autonomia do iX3", "pot\u00eancia do M5", "0-100 do i4".'};
-
-            const mots = Object.values(geniusMots).filter(m => m.modelo_id === modelo.id);
-            if (mots.length === 0) return {text: 'Sem dados para ' + modelo.nome};
-
-            if (p.includes('motorizac') || p.includes('versao') || p.includes('versoes')) {
-                return {text: modelo.nome + ':\n' + mots.map(m => '- ' + (m.nome_visual||m.codigo)).join('\n')};
-            }
-
-            let motsAlvo = mots;
-            const m2 = mots.find(m => {
-                const n = normG(m.nome_visual||m.codigo);
-                return p.includes(n) || n.split(' ').some(w => w.length >= 3 && p.includes(w));
-            });
-            if (m2) motsAlvo = [m2];
-
-            const respostas = [];
-            for (const mot of motsAlvo) {
-                const specs = geniusSpecs[mot.id];
-                if (!specs) continue;
-                const chaves = geniusEncontrarChave(pergunta, specs);
-                if (!chaves) continue;
-                chaves.forEach(chave => {
-                    const v = specs[chave];
-                    if (v && v !== '\u2014') respostas.push({mot: mot.nome_visual||mot.codigo, chave, valor: v});
-                });
-            }
-
-            if (respostas.length === 0) return {text: 'N\u00e3o encontrei essa especifica\u00e7\u00e3o para o ' + modelo.nome + '.\nTenta: autonomia, pot\u00eancia, consumo, bateria, velocidade, 0-100, peso, tra\u00e7\u00e3o, carregamento.'};
-
-            if (respostas.length === 1) return {text: modelo.nome + ' (' + respostas[0].mot + ')\n' + respostas[0].chave + ': ' + respostas[0].valor};
-
-            let html = '<p class="text-sm font-black text-gray-800 mb-2">' + modelo.nome + '</p><div class="space-y-1">';
-            respostas.forEach(r => {
-                html += '<div class="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-0"><span class="text-xs text-gray-500 flex-1">' + r.mot + '</span><span class="text-xs font-black text-bmw ml-2">' + r.valor + '</span></div>';
-            });
-            html += '</div>';
-            return {html};
-        }
-
-        async function geniusEnviar() {
-            const input = document.getElementById('genius-input');
-            const q = input.value.trim();
-            if (!q || geniusLoading) return;
-            input.value = '';
-            geniusLoading = true;
-            geniusMsg(q, 'user', false);
-            geniusTyping(true);
-            await new Promise(r => setTimeout(r, 500));
-            try {
-                const resp = await geniusResponder(q);
-                geniusTyping(false);
-                if (resp.html) geniusMsg(resp.html, 'bot', true);
-                else geniusMsg(resp.text || '', 'bot', false);
-            } catch(e) {
-                geniusTyping(false);
-                geniusMsg('Erro. Tenta novamente.', 'bot', false);
-            }
-            geniusLoading = false;
-        }
-
-        function geniusPergunta(t) { document.getElementById('genius-input').value = t; geniusEnviar(); }
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // OPCIONAIS
