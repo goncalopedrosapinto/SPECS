@@ -1254,7 +1254,8 @@
         }
 
         function miniMudarTab(tab) {
-dummy-already-done
+            document.getElementById('mini-conteudo-dados').classList.add('hidden');
+            document.getElementById('mini-conteudo-opcionais').classList.add('hidden');
             document.getElementById('conteudo-calc').classList.add('hidden');
             ['dados','opcionais','calc'].forEach(function(t) {
                 var b = document.getElementById('mini-tab-' + t);
